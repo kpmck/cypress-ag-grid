@@ -1,0 +1,14 @@
+{
+  "name": "cypress-ag-grid",
+  "version": "1.0.0",
+  "description": "Cypress plugin to interact with ag grid",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kerry McKeever",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^7.1.0"
+  }
+}

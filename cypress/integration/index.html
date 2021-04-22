@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://unpkg.com/ag-grid-enterprise/dist/ag-grid-enterprise.min.noStyle.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-grid.css">
+  <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-theme-alpine.css">
+</head>
+<body>
+  <button onclick="getSelectedRows()">Get Selected Rows</button>
+  <div id="myGrid" style="height: 600px;width:900px;" class="ag-theme-alpine"></div>
+  <script src="grid.js" type="text/javascript" charset="utf-8">  
+</script>
+<script>
+    const getSelectedRows = () => {
+    const selectedNodes = gridOptions.api.getSelectedNodes()
+    const selectedData = selectedNodes.map( node => node.data )
+    const selectedDataStringPresentation = selectedData.map( node => `${node.make} ${node.model}`).join(', ')
+    alert(`Selected nodes: ${selectedDataStringPresentation}`);
+    }
+</script>
+</body>
+</html>
