@@ -1,6 +1,5 @@
 /// <reference types="cypress" />
 
-import { toggleColumnFromSideBar } from "../../src/agGrid/agGridInteractions";
 import { sort } from "../../src/agGrid/sort.enum";
 import {
   deleteKey,
@@ -95,8 +94,35 @@ describe("ag-grid scenarios", () => {
       { Year: "2020", Make: "BMW", Model: "2002", Price: "88001" },
     ];
     cy.get(agGridSelector).agGridColumnFilterCheckboxMenu({
-      columnName: "Model",
-      filterValue: "2002",
+      searchCriteria: {
+        columnName: "Model",
+        filterValue: "2002",
+      },
+      hasApplyButton: true,
+    });
+    cy.get(agGridSelector)
+      .getAgGrid()
+      .then((actualTableData) => {
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+      });
+  });
+
+  it("able to filter by checkbox - multiple columns", () => {
+    const expectedTableData = [
+        { Year: "2020", Make: "BMW", Model: "3-series", Price: "45000" },
+        { Year: "2020", Make: "BMW", Model: "3-series", Price: "32000" },
+        { Year: "2020", Make: "BMW", Model: "2002", Price: "88001" },
+    ];
+    cy.get(agGridSelector).agGridColumnFilterCheckboxMenu({
+      searchCriteria: [{
+        columnName: "Model",
+        filterValue: "2002",
+      },
+      {
+        columnName: "Model",
+        filterValue: "3-series",
+      }
+    ],
       hasApplyButton: true,
     });
     cy.get(agGridSelector)
@@ -114,10 +140,38 @@ describe("ag-grid scenarios", () => {
     ];
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
     cy.get(agGridSelector).agGridColumnFilterTextMenu({
-      columnName: "Price",
-      filterValue: "32000",
+      searchCriteria: {
+        columnName: "Price",
+        filterValue: "32000",
+        operator: filterOperator.equals,
+      },
       hasApplyButton: true,
-      operator: filterOperator.equals,
+    });
+    cy.get(agGridSelector)
+      .getAgGrid()
+      .then((actualTableData) => {
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+      });
+  });
+
+  it("able to filter by text - menu - multiple columns", () => {
+    const expectedTableData = [
+      { Year: "2020", Make: "BMW", Model: "3-series", Price: "32000" },
+    ];
+    cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
+    cy.get(agGridSelector).agGridColumnFilterTextMenu({
+      searchCriteria: [{
+        columnName: "Price",
+        filterValue: "32000",
+        operator: filterOperator.equals,
+      },
+      {
+        columnName: "Make",
+        filterValue: "BMW",
+        operator: filterOperator.equals,
+      }
+    ],
+      hasApplyButton: true,
     });
     cy.get(agGridSelector)
       .getAgGrid()
@@ -135,8 +189,10 @@ describe("ag-grid scenarios", () => {
     ];
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
     cy.get(agGridSelector).agGridColumnFilterTextFloating({
-      columnName: "Make",
-      filterValue: "Ford",
+      searchCriteria: {
+        columnName: "Make",
+        filterValue: "Ford",
+      },
       hasApplyButton: true,
     });
     cy.get(agGridSelector)
@@ -146,17 +202,45 @@ describe("ag-grid scenarios", () => {
       });
   });
 
+  it("able to filter by text - floating filter - multiple columns", () => {
+    const expectedTableData = [
+      { Year: "1990", Make: "Ford", Model: "Taurus", Price: "900" },
+    ];
+    cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: [{
+        columnName: "Make",
+        filterValue: "Ford",
+      },
+      {
+        columnName: "Year",
+        filterValue: "1990",
+      }
+    ],
+      hasApplyButton: true,
+    });
+    cy.get(agGridSelector)
+      .getAgGrid()
+      .then((actualTableData) => {
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+      });
+  });  
+
   it("able to validate empty table", () => {
     //Search for an entry that does not exist
     cy.get(agGridSelector).agGridColumnFilterTextMenu({
-      columnName: "Price",
-      filterValue: "0",
+      searchCriteria: {
+        columnName: "Price",
+        filterValue: "0",
+        operator: filterOperator.equals,
+      },
       hasApplyButton: true,
-      operator: filterOperator.equals,
     });
-    cy.get(agGridSelector).getAgGrid().then((actualTableData)=>{
+    cy.get(agGridSelector)
+      .getAgGrid()
+      .then((actualTableData) => {
         cy.agGridValidateEmptyTable(actualTableData);
-    })
+      });
   });
 
   it("able to sort by ascending order", () => {
@@ -206,7 +290,7 @@ describe("ag-grid scenarios", () => {
   });
 
   it("remove column from grid and verify select column data", () => {
-    toggleColumnFromSideBar("Year", true);
+    cy.get(agGridSelector).agGridToggleColumnsSideBar("Year", true);
     cy.fixture("cardata").then((expectedTableData) => {
       const expectedData_yearColumnRemoved = removePropertyFromCollection(
         expectedTableData,
@@ -224,7 +308,7 @@ describe("ag-grid scenarios", () => {
   });
 
   it("remove single pinned column from grid and verify select column data", () => {
-    toggleColumnFromSideBar("Price", true);
+    cy.get(agGridSelector).agGridToggleColumnsSideBar("Price", true);
     cy.fixture("cardata").then((expectedTableData) => {
       const expectedData_priceColumnRemoved = removePropertyFromCollection(
         expectedTableData,
@@ -242,9 +326,9 @@ describe("ag-grid scenarios", () => {
     });
   });
 
-  it("remove multiple pinned columns from grid and verify select column data", () => {
-    toggleColumnFromSideBar("Price", true);
-    toggleColumnFromSideBar("Make", true);
+  it("remove multiple columns from grid and verify select column data", () => {
+    cy.get(agGridSelector).agGridToggleColumnsSideBar("Price", true);
+    cy.get(agGridSelector).agGridToggleColumnsSideBar("Make", true);
     cy.fixture("cardata").then((expectedTableData) => {
       const expectedData_multipleColumnsRemoved = removePropertyFromCollection(
         expectedTableData,
@@ -269,11 +353,14 @@ describe("ag-grid scenarios", () => {
       { Year: "2020", Make: "BMW", Model: "3-series" },
       { Year: "2020", Make: "Mercedes", Model: "GLC300" },
     ];
-    cy.get(agGridSelector).getAgGrid({onlyColumns: ["Year", "Make", "Model"]}).then((actualTableData)=>{
-    cy.agGridValidateRowsSubset(actualTableData, expectedTableData);
+    cy.get(agGridSelector)
+      .getAgGrid({ onlyColumns: ["Year", "Make", "Model"] })
+      .then((actualTableData) => {
+        cy.agGridValidateRowsSubset(actualTableData, expectedTableData);
+      });
   });
 });
-})
+
 function removePropertyFromCollection(expectedTableData, columnsToExclude) {
   //Exclude any specified columns
   if (columnsToExclude) {
