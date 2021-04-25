@@ -2,13 +2,14 @@
   "name": "cypress-ag-grid",
   "version": "1.0.0",
   "description": "Cypress plugin to interact with ag grid",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx cypress run --spec cypress/integration/ag-grid-spec.js",
+    "test:watch": "npx cypress open"
   },
   "author": "Kerry McKeever",
-  "license": "ISC",
-  "devDependencies": {
-    "cypress": "^7.1.0"
+  "license": "MIT",
+  "dependencies": {
+    "cypress": "6.2.1"
   }
 }

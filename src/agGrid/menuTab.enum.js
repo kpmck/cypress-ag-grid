@@ -1,5 +1,6 @@
 export const filterTab = {
   columns: "columns",
   filter: "filter",
-  search: "search"
+  search: "search",
+  general: "general"
 }
