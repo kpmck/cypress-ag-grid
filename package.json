@@ -1,8 +1,8 @@
 {
   "name": "cypress-ag-grid",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Cypress plugin to interact with ag grid",
-  "main": "src/index.js",
+  "main": "src",
   "repository":{
     "type":"git",
     "url": "git+https://github.com/kpmck/cypress-ag-grid.git"
