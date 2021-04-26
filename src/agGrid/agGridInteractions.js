@@ -12,23 +12,23 @@ function sortElementsByAttributeIndex(index) {
 
 /**
  * Retrieves the values from the *displayed* page in ag grid and assigns each value to its respective column name.
- * @param subject The get() selector for which ag grid table you wish to retrieve.
+ * @param agGridElement The get() selector for which ag grid table you wish to retrieve.
  * @param options Provide an array of columns you wish to exclude from the table retrieval.
  */
-export const getAgGrid = (subject, options = {}) => {
+export const getAgGridData = (agGridElement, options = {}) => {
   const agGridColumnSelectors =
     ".ag-pinned-left-cols-container^.ag-center-cols-clipper^.ag-pinned-right-cols-container";
-  if (subject.get().length > 1)
+  if (agGridElement.get().length > 1)
     throw new Error(
-      `Selector "${subject.selector}" returned more than 1 element.`
+      `Selector "${agGridElement.selector}" returned more than 1 element.`
     );
 
-  const tableElement = subject.get()[0].querySelectorAll(".ag-root")[0];
+  const tableElement = agGridElement.get()[0].querySelectorAll(".ag-root")[0];
   const agGridSelectors = agGridColumnSelectors.split("^");
-  let headers = [
-    ...tableElement.querySelectorAll(".ag-header-cell-text"),
+  const headers = [
+    ...tableElement.querySelectorAll(".ag-header-cell-text")
   ].map((e) => e.textContent.trim());
-  let allRows = [];
+  const allRows = [];
   let rows = [];
 
   agGridSelectors.forEach((selector) => {
@@ -45,8 +45,8 @@ export const getAgGrid = (subject, options = {}) => {
   });
 
   // Combine results from all specified tables (either single table, or all pinned columns) by index
-  rows = allRows.reduce(function (a, b) {
-    return a.map(function (v, i) {
+  rows = allRows.reduce(function(a, b) {
+    return a.map(function(v, i) {
       return (v + "," + b[i]).split(",");
     });
   });
@@ -55,6 +55,7 @@ export const getAgGrid = (subject, options = {}) => {
   return rows.map((row) =>
     row.reduce((acc, curr, idx) => {
       if (
+        //@ts-ignore
         (options.onlyColumns && !options.onlyColumns.includes(headers[idx])) ||
         headers[idx] === undefined
       ) {
@@ -79,21 +80,21 @@ function getColumnHeaderElement(agGridElement, columnName) {
 
 /**
  *  * Performs sorting operation on the specified column
- * @param {*} subject The get() selector for which ag grid table you wish to retrieve.
+ * @param {*} agGridElement The get() selector for which ag grid table you wish to retrieve.
  * @param columnName The name of the column you wish to sort
  * @param sortDirection sort enum value
  * @returns
  */
-export function sortColumnBy(subject, columnName, sortDirection) {
+export function sortColumnBy(agGridElement, columnName, sortDirection) {
   if (sortDirection === sort.ascending || sortDirection === sort.descending) {
-    return getColumnHeaderElement(subject, columnName)
+    return getColumnHeaderElement(agGridElement, columnName)
       .parents(".ag-header-cell")
       .invoke("attr", "aria-sort")
       .then((value) => {
         cy.log(`sort: ${sortDirection}`);
         if (value !== sortDirection) {
-          getColumnHeaderElement(subject, columnName).click().wait(250);
-          sortColumnBy(subject, columnName, sortDirection);
+          getColumnHeaderElement(agGridElement, columnName).click().wait(250);
+          sortColumnBy(agGridElement, columnName, sortDirection);
         }
       });
   } else {
@@ -151,8 +152,8 @@ function getFilterColumnButtonElement(
             cy.wrap($ele)
               .parents(".ag-header-row-column")
               .siblings(".ag-header-row-floating-filter")
-              .find(".ag-floating-filter-button")
-              .eq(columnIndex - 1);
+              .find(`.ag-header-cell[aria-colindex=${columnIndex}]`)
+              .find(".ag-floating-filter-button");
           });
       });
   else
@@ -228,16 +229,20 @@ function toggleColumnCheckboxFilter(
 
 function populateSearchCriteria(searchCriteria, hasApplyButton = false) {
   const options = {};
+  //@ts-ignore
   options.searchCriteria = {};
+  //@ts-ignore
   options.searchCriteria.columnName = searchCriteria.columnName;
+  //@ts-ignore
   options.searchCriteria.filterValue = searchCriteria.filterValue;
+  //@ts-ignore
   options.hasApplyButton = hasApplyButton;
   return options;
 }
 
 /**
  *  * Performs a filter operation on the specified column via the context menu using plain text search
- * @param subject The get() selector for which ag grid table you wish to retrieve.
+ * @param agGridElement The get() selector for which ag grid table you wish to retrieve.
  * @param {{searchCriteria:[{columnName:string,filterValue:string,operator?:string}], hasApplyButton?:boolean}} options JSON with search properties
  * @param options.searchCriteria JSON with search properties
  * @param options.searchCriteria.columnName [REQUIRED] name of the column to filter
@@ -245,7 +250,7 @@ function populateSearchCriteria(searchCriteria, hasApplyButton = false) {
  * @param options.searchCriteria.operator [Optional] Use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values).
  * @param options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
  */
-export function filterBySearchTextColumnMenu(subject, options) {
+export function filterBySearchTextColumnMenu(agGridElement, options) {
   // Check if there are multiple search criteria provided by attempting to access the columnName
   if (!options.searchCriteria.columnName) {
     options.searchCriteria.forEach((_searchCriteria) => {
@@ -253,30 +258,30 @@ export function filterBySearchTextColumnMenu(subject, options) {
         _searchCriteria,
         options.hasApplyButton
       );
-      _filterBySearchTextColumnMenu(subject, _options);
+      _filterBySearchTextColumnMenu(agGridElement, _options);
     });
   } else {
-    _filterBySearchTextColumnMenu(subject, options);
+    _filterBySearchTextColumnMenu(agGridElement, options);
   }
 }
 
-function _filterBySearchTextColumnMenu(subject, options) {
+function _filterBySearchTextColumnMenu(agGridElement, options) {
   // Get the header's menu element
   getFilterColumnButtonElement(
-    subject,
+    agGridElement,
     options.searchCriteria.columnName
   ).click();
   filterBySearchTerm(
-    subject,
+    agGridElement,
     options.searchCriteria.filterValue,
     options.searchCriteria.operator
   );
-  applyColumnFilter(subject, options.hasApplyButton);
+  applyColumnFilter(agGridElement, options.hasApplyButton);
 }
 
 /**
  *  * Performs a filter operation on the specified column via the column's floating filter field using plain text search
- * @param subject The get() selector for which ag grid table you wish to retrieve.
+ * @param agGridElement The get() selector for which ag grid table you wish to retrieve.
  * @param {{searchCriteria:[{columnName:string,filterValue:string,operator?:string}], hasApplyButton?:boolean}} options JSON with search properties
  * @param options.searchCriteria JSON with search properties and options
  * @param options.searchCriteria.columnName name of the column to filter
@@ -284,7 +289,7 @@ function _filterBySearchTextColumnMenu(subject, options) {
  * @param options.searchCriteria.operator [Optional] Use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values).
  * @param options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
  */
-export function filterBySearchTextColumnFloatingFilter(subject, options) {
+export function filterBySearchTextColumnFloatingFilter(agGridElement, options) {
   // Check if there are multiple search criteria provided by attempting to access the columnName
   if (!options.searchCriteria.columnName) {
     options.searchCriteria.forEach((_searchCriteria) => {
@@ -292,15 +297,15 @@ export function filterBySearchTextColumnFloatingFilter(subject, options) {
         _searchCriteria,
         options.hasApplyButton
       );
-      _filterBySearchTextColumnFloatingFilter(subject, _options);
+      _filterBySearchTextColumnFloatingFilter(agGridElement, _options);
     });
   } else {
-    _filterBySearchTextColumnFloatingFilter(subject, options);
+    _filterBySearchTextColumnFloatingFilter(agGridElement, options);
   }
 }
 
-function _filterBySearchTextColumnFloatingFilter(subject, options) {
-  cy.get(subject).then((agGridElement) => {
+function _filterBySearchTextColumnFloatingFilter(agGridElement, options) {
+  cy.get(agGridElement).then((agGridElement) => {
     getFilterColumnButtonElement(
       agGridElement,
       options.searchCriteria.columnName,
@@ -317,14 +322,14 @@ function _filterBySearchTextColumnFloatingFilter(subject, options) {
 
 /**
  *  * Performs a filter operation on the specified column and selects only the provided filterValue
- * @param subject The get() selector for which ag grid table you wish to retrieve.
+ * @param agGridElement The get() selector for which ag grid table you wish to retrieve.
  * @param {{searchCriteria:[{columnName:string,filterValue:string], hasApplyButton?:boolean}} options JSON with search values and options
  * @param options.searchCriteria [REQUIRED] JSON with search properties
  * @param options.searchCriteria.columnName [REQUIRED] name of the column to filter
  * @param options.searchCriteria.filterValue [REQUIRED] value to input into the filter textbox
  * @param options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
  */
-export function filterByCheckboxColumnMenu(subject, options) {
+export function filterByCheckboxColumnMenu(agGridElement, options) {
   // Check if there are multiple search criteria provided by attempting to access the columnName
   if (!options.searchCriteria.columnName) {
     options.searchCriteria.forEach((_searchCriteria) => {
@@ -332,15 +337,15 @@ export function filterByCheckboxColumnMenu(subject, options) {
         _searchCriteria,
         options.hasApplyButton
       );
-      _filterByCheckboxColumnMenu(subject, _options);
+      _filterByCheckboxColumnMenu(agGridElement, _options);
     });
   } else {
-    _filterByCheckboxColumnMenu(subject, options);
+    _filterByCheckboxColumnMenu(agGridElement, options);
   }
 }
 
-function _filterByCheckboxColumnMenu(subject, options) {
-  cy.get(subject).then((agGridElement) => {
+function _filterByCheckboxColumnMenu(agGridElement, options) {
+  cy.get(agGridElement).then((agGridElement) => {
     getFilterColumnButtonElement(
       agGridElement,
       options.searchCriteria.columnName
@@ -362,16 +367,15 @@ function _filterByCheckboxColumnMenu(subject, options) {
 }
 
 /**
- * Will perform a filter for all search criteria provided, then selects the first found entry in the grid
+ * Will perform a filter for all search criteria provided, then selects all found entries in the grid
  * @param searchCriteria a "\^" delimited string of all columns and searchCriteria to search for in the grid (i.e. "Name=John Smith^Rate Plan=Standard"
  */
-export function filterAndSelectGridEntryByColumnSearch(searchCriteria) {
-  findGridEntriesByColumnSearch(searchCriteria);
-  cy.get(".ag-selection-checkbox")
-    .filter(":visible")
-    .find("input")
-    .first()
-    .check();
+export function filterGridEntriesBySearchText(agGridElement, searchCriteria, isFloatingFilter = false) {
+  if (isFloatingFilter) {
+    filterBySearchTextColumnFloatingFilter(agGridElement, searchCriteria);
+  } else {
+    filterBySearchTextColumnMenu(agGridElement, searchCriteria);
+  }
 }
 
 /**
@@ -380,8 +384,8 @@ export function filterAndSelectGridEntryByColumnSearch(searchCriteria) {
  * @param doRemove true will remove the column. false will add the column.
  */
 
-export function toggleColumnFromSideBar(subject, columnName, doRemove) {
-  cy.get(subject)
+export function toggleColumnFromSideBar(agGridElement, columnName, doRemove) {
+  cy.get(agGridElement)
     .find(".ag-column-select-header-filter-wrapper")
     .find("input")
     .then(($columnFilterInputField) => {
