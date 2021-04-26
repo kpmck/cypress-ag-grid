@@ -1,6 +1,6 @@
 {
   "name": "cypress-ag-grid",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Cypress plugin to interact with ag grid",
   "main": "src",
   "repository":{
