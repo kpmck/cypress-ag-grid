@@ -1,5 +1,3 @@
-/// <reference types="./index" />
-
 import {getAgGrid, sortColumnBy} from "./agGrid/agGridInteractions"
 import {validateTablePages, validateTableExactOrder, validateEmptyTable, validateTableRowSubset} from "./agGrid/agGridValidations"
 import {filterByCheckboxColumnMenu, filterBySearchTextColumnFloatingFilter, filterBySearchTextColumnMenu, toggleColumnFromSideBar} from "./agGrid/agGridInteractions";
