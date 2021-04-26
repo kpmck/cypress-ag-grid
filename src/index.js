@@ -1,4 +1,4 @@
-/// <reference types="cypress" />
+/// <reference types="./index" />
 
 import {getAgGrid, sortColumnBy} from "./agGrid/agGridInteractions"
 import {validateTablePages, validateTableExactOrder, validateEmptyTable, validateTableRowSubset} from "./agGrid/agGridValidations"

@@ -374,6 +374,12 @@ export function filterAndSelectGridEntryByColumnSearch(searchCriteria) {
     .check();
 }
 
+/**
+ * Will add or remove a column from ag grid.
+ * @param columnName The column name to add/remove
+ * @param doRemove true will remove the column. false will add the column.
+ */
+
 export function toggleColumnFromSideBar(subject, columnName, doRemove) {
   cy.get(subject)
     .find(".ag-column-select-header-filter-wrapper")
