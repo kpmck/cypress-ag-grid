@@ -2,6 +2,12 @@
 import { sort } from "./sort.enum";
 import { filterTab } from "./menuTab.enum";
 
+/**
+ * Uses the attribute value's index and sorts the data accordingly.
+ * For our purposes, we are getting the attribute with the items' indices and sorting accordingly.
+ * @param {*} index 
+ * @returns 
+ */
 function sortElementsByAttributeIndex(index) {
   return (a, b) => {
     const contentA = parseInt(a.attributes[index].nodeValue, 10).valueOf();
@@ -28,11 +34,11 @@ export const getAgGridData = (agGridElement, options = {}) => {
   const headers = [
     ...tableElement.querySelectorAll(".ag-header-cell-text")
   ].map((e) => e.textContent.trim());
-  const allRows = [];
+  let allRows = [];
   let rows = [];
 
   agGridSelectors.forEach((selector) => {
-    const _rows = [...tableElement.querySelectorAll(`${selector} .ag-row`)]
+    const _rows = [...tableElement.querySelectorAll(`${selector}:not(.ag-hidden) .ag-row`)]
       // Sort rows by their row-index attribute value
       .sort(sortElementsByAttributeIndex(1))
       .map((row) => {
@@ -44,12 +50,20 @@ export const getAgGridData = (agGridElement, options = {}) => {
     allRows.push(_rows);
   });
 
+  // Remove any empty arrays before merging
+  allRows = allRows.filter(function(ele){
+    return ele.length
+  })
+
+  if(!allRows.length) rows = [];
+  else{
   // Combine results from all specified tables (either single table, or all pinned columns) by index
   rows = allRows.reduce(function(a, b) {
     return a.map(function(v, i) {
       return (v + "," + b[i]).split(",");
     });
   });
+}
 
   // return structured object from headers and rows variables
   return rows.map((row) =>
@@ -99,7 +113,7 @@ export function sortColumnBy(agGridElement, columnName, sortDirection) {
       });
   } else {
     throw new Error(
-      "sortDirection must be either 'ascending' or 'descending'. Please import and use sort.enum."
+      "sortDirection must be either 'ascending' or 'descending'."
     );
   }
 }
