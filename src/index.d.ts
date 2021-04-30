@@ -2,7 +2,7 @@
 
 declare namespace Cypress {
     interface Chainable {
-        getAgGridData(options?: {}): Chainable<any>;
+        getAgGridData(options?: {}): Chainable<JQuery<Element>>;
         /**
          *  * Performs sorting operation on the specified column
          * @param {*} subject The get() selector for which ag grid table you wish to retrieve.
@@ -10,7 +10,7 @@ declare namespace Cypress {
          * @param sortDirection sort enum value
          * @returns
          */
-        agGridSortColumn(columnName: string, sortDirection: string): Chainable<any>;
+        agGridSortColumn(columnName: string, sortDirection: string): Chainable<JQuery<Element>>;
 
         /**
          *  * Performs a filter operation on the specified column and selects only the provided filterValue
@@ -21,7 +21,7 @@ declare namespace Cypress {
          * @param options.searchCriteria.filterValue [REQUIRED] value to input into the filter textbox
          * @param options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
          */
-        agGridColumnFilterCheckboxMenu(options: {}): Chainable<any>;
+        agGridColumnFilterCheckboxMenu(options: {}): Chainable<JQuery<Element>>;
 
         /**
          *  * Performs a filter operation on the specified column via the context menu using plain text search
@@ -33,7 +33,7 @@ declare namespace Cypress {
          * @param options.searchCriteria.operator [Optional] Use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values).
          * @param options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
          */
-        agGridColumnFilterTextMenu(options: {}): Chainable<any>;
+        agGridColumnFilterTextMenu(options: {}): Chainable<JQuery<Element>>;
 
         /**
          *  * Performs a filter operation on the specified column via the column's floating filter field using plain text search
@@ -45,7 +45,7 @@ declare namespace Cypress {
          * @param options.searchCriteria.operator [Optional] Use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values).
          * @param options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
          */
-        agGridColumnFilterTextFloating(options: {}): Chainable<any>;
+        agGridColumnFilterTextFloating(options: {}): Chainable<JQuery<Element>>;
 
         /**
          *  * Validates the grid data across its pages. Performs a validation that he data exists on each page, not accounting for order.
@@ -55,7 +55,7 @@ declare namespace Cypress {
         agGridValidatePaginatedTable(
             expectedPaginatedTableData: any,
             onlyColumns: {}
-        ): Chainable<any>;
+        ): Chainable<JQuery<Element>>;
 
         /**
          * Performs an exact validation to verify the data exists within the displayed grid page.
@@ -65,7 +65,7 @@ declare namespace Cypress {
         agGridValidateRowsExactOrder(
             actualTableData: {},
             expectedTableData: {}
-        ): Chainable<any>;
+        ): Chainable<JQuery<Element>>;
 
         /**
          * Performs a deep include validation to verify the data exists within the displayed grid page
@@ -75,13 +75,13 @@ declare namespace Cypress {
         agGridValidateRowsSubset(
             actualTableData: {},
             expectedTableData: {}
-        ): Chainable<any>;
+        ): Chainable<JQuery<Element>>;
 
         /**
          * Validates the Ag Grid table data is empty.
          * @param {*} actualTableData The actual page data returned from the getAgGridData() command.
          */
-        agGridValidateEmptyTable(actualTableData: {}): Chainable<any>;
+        agGridValidateEmptyTable(actualTableData: {}): Chainable<JQuery<Element>>;
 
         /**
          * Will add or remove a column from ag grid.
@@ -91,6 +91,6 @@ declare namespace Cypress {
         agGridToggleColumnsSideBar(
             columnName: string,
             doRemove: boolean
-        ): Chainable<any>;
+        ): Chainable<JQuery<Element>>;
     }
 }
