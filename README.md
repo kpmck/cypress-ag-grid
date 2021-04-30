@@ -1,6 +1,25 @@
 # cypress-ag-grid
 Cypress plugin for interacting with and validating against ag grid.
 
+## Table of Contents
+  * [Installation](#installation)
+  * [Usage](#usage)
+    + [Grid Interaction]()
+        - [Getting Data From the Grid](#getting-data-from-the-grid-)
+        - [Getting Select Row Data](#getting-select-row-data)
+        - [Sorting Columns](#sorting-columns)
+        - [Filter by Text - Column Menu](#filter-by-text---column-menu)
+        - [Filterby Text - Floating Filter](#filterby-text---floating-filter)
+        - [Filter by Checkbox - Column Menu](#filter-by-checkbox---column-menu)
+        - [Add or Remove Columns](#add-or-remove-columns)
+    + [Grid Validation]()
+        - [Validate Paginated Table](#validate-paginated-table)
+        - [Validate Table in the Exact Order](#validate-table-in-the-exact-order)
+        - [Validate Subset of Table Data](#validate-subset-of-table-data)
+        - [Validate Empty Grid](#validate-empty-grid)
+  * [Limitations](#limitations)
+<br/>
+<br/>
 ## Installation
 
 ```bash
@@ -17,7 +36,8 @@ Consider the ag grid example below:
 
 With the following DOM structure:
 ![alt text](./ag-grid-example-dom.png "AG Grid Dom")
-
+<br/>
+<br/>
 ### Getting Data From the Grid:
 To get the Ag Grid data, you must chain `.getAgGridData()` after the `cy.get()` command for the topmost level of the grid, including controls and headers (see selected DOM element in above image).
 
