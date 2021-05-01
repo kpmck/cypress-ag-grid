@@ -54,11 +54,11 @@ cy.getAgGridData();
 The correct command will return the following:
 ```json
 [
-    { Year: "2020", Make: "Toyota", Model: "Celica" },
-    { Year: "2020", Make: "Ford", Model: "Mondeo" },
-    { Year: "2020", Make: "Porsche", Model: "Boxter" },
-    { Year: "2020", Make: "BMW", Model: "3-series" },
-    { Year: "2020", Make: "Mercedes", Model: "GLC300" },
+    { "Year": "2020", "Make": "Toyota", "Model": "Celica" },
+    { "Year": "2020", "Make": "Ford", "Model": "Mondeo" },
+    { "Year": "2020", "Make": "Porsche", "Model": "Boxter" },
+    { "Year": "2020", "Make": "BMW", "Model": "3-series" },
+    { "Year": "2020", "Make": "Mercedes", "Model": "GLC300" },
 ]
 ```
 </br>
@@ -74,11 +74,11 @@ cy.get("#myGrid).getAgGridData({ onlyColumns: ["Year", "Make"] })
 The above command will return the follwoing:
 ```json
 [
-    { Year: "2020", Make: "Toyota"},
-    { Year: "2020", Make: "Ford"},
-    { Year: "2020", Make: "Porsche"},
-    { Year: "2020", Make: "BMW"},
-    { Year: "2020", Make: "Mercedes"},
+    { "Year": "2020", "Make": "Toyota"},
+    { "Year": "2020", "Make": "Ford"},
+    { "Year": "2020", "Make": "Porsche"},
+    { "Year": "2020", "Make": "BMW"},
+    { "Year": "2020", "Make": "Mercedes"},
 ]
 ```
 </br>
@@ -181,18 +181,18 @@ Example:
 ```javascript
     const expectedPaginatedTableData = [
       [
-        { Year: "2020", Make: "Toyota", Model: "Celica" },
-        { Year: "2020", Make: "Ford", Model: "Mondeo" },
-        { Year: "2020", Make: "Porsche", Model: "Boxter" },
-        { Year: "2020", Make: "BMW", Model: "3-series" },
-        { Year: "2020", Make: "Mercedes", Model: "GLC300" },
+        { "Year": "2020", "Make": "Toyota", "Model": "Celica" },
+        { "Year": "2020", "Make": "Ford", "Model": "Mondeo" },
+        { "Year": "2020", "Make": "Porsche", "Model": "Boxter" },
+        { "Year": "2020", "Make": "BMW", "Model": "3-series" },
+        { "Year": "2020", "Make": "Mercedes", "Model": "GLC300" },
       ],
       [
-        { Year: "2020", Make: "Honda", Model: "Civic" },
-        { Year: "2020", Make: "Honda", Model: "Accord" },
-        { Year: "2020", Make: "Ford", Model: "Taurus" },
-        { Year: "2020", Make: "Hyundai", Model: "Elantra" },
-        { Year: "2020", Make: "Toyota", Model: "Celica" },
+        { "Year": "2020", "Make: "Honda", "Model": "Civic" },
+        { "Year": "2020", "Make": "Honda", "Model": "Accord" },
+        { "Year": "2020", "Make": "Ford", "Model": "Taurus" },
+        { "Year": "2020", "Make": "Hyundai", "Model": "Elantra" },
+        { "Year": "2020", "Make": "Toyota", "Model": "Celica" },
       ],
       ...other table data
     ];
@@ -228,11 +228,11 @@ This command will validate a subset of the table data. Ideal for verifying one o
 Example:
 ```javascript
     const expectedTableData = [
-      { Year: "2020", Make: "Toyota", Model: "Celica" },
-      { Year: "2020", Make: "Ford", Model: "Mondeo" },
-      { Year: "2020", Make: "Porsche", Model: "Boxter" },
-      { Year: "2020", Make: "BMW", Model: "3-series" },
-      { Year: "2020", Make: "Mercedes", Model: "GLC300" },
+      { "Year": "2020", "Make": "Toyota", "Model": "Celica" },
+      { "Year": "2020", "Make": "Ford", "Model": "Mondeo" },
+      { "Year": "2020", "Make": "Porsche", "Model": "Boxter" },
+      { "Year": "2020", "Make": "BMW", "Model": "3-series" },
+      { "Year": "2020", "Make": "Mercedes", "Model": "GLC300" },
     ];
     cy.get(agGridSelector)
       .getAgGridData({ onlyColumns: ["Year", "Make", "Model"] })
