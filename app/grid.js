@@ -44,6 +44,7 @@ const eGridDiv = document.querySelector("#myGrid");
 // create the grid passing in the div to use together with the columns &amp; data we want to use
 new agGrid.Grid(eGridDiv, gridOptions);
 
+// Grab the grid data from the supplied API endpoint
 agGrid
   .simpleHttpRequest({
     url: "https://api.jsonbin.io/b/608304f69a9aa933335613a6/2",
