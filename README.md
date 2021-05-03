@@ -4,7 +4,7 @@ Cypress plugin for interacting with and validating against ag grid.
 ## Table of Contents
   * [Installation](#installation)
   * [Usage](#usage)
-    + [Grid Interaction]()
+    + [Grid Interaction](#)
         - [Getting Data From the Grid](#getting-data-from-the-grid-)
         - [Getting Select Row Data](#getting-select-row-data)
         - [Sorting Columns](#sorting-columns)
@@ -12,7 +12,7 @@ Cypress plugin for interacting with and validating against ag grid.
         - [Filterby Text - Floating Filter](#filterby-text---floating-filter)
         - [Filter by Checkbox - Column Menu](#filter-by-checkbox---column-menu)
         - [Add or Remove Columns](#add-or-remove-columns)
-    + [Grid Validation]()
+    + [Grid Validation](#)
         - [Validate Paginated Table](#validate-paginated-table)
         - [Validate Table in the Exact Order](#validate-table-in-the-exact-order)
         - [Validate Subset of Table Data](#validate-subset-of-table-data)
@@ -137,7 +137,7 @@ See [Filter by Text - Column Menu](#filter-by-Text---Column-Menu) for example an
 </br>
 
 ### Filter by Checkbox - Column Menu
-This command will filter a column by a checbkox text value from its menu.
+This command will filter a column by a checkbox text value from its menu.
 ![alt text](./ag-grid-example-filter-checkbox-menu.png "AG Grid Dom - Filter by Checkbox Menu")
 
 Definition:
@@ -261,7 +261,7 @@ Example:
 ## Limitations
 * Unable to validate the entirety of an unlimited scrolling grid.
 * Unable to validate data that is out of view. The DOM will register the ag grid data as it's scrolled into view.
-  * To combat this, in your ag grid code set a check if the Cypress window is controlling the app and set the ag grid api to `.sizeColumnsToFit()`. Read more [here](https://www.ag-grid.com/javascript-grid/column-sizing/#size-columns-to-fit)
+  * To combat this, in your code where the ag grid is called, check if the Cypress window is controlling the app and set the ag grid object to `.sizeColumnsToFit()`. You can see an example of this in the `app/grid.js` file of this repository. Read more [here](https://www.ag-grid.com/javascript-grid/column-sizing/#size-columns-to-fit)
   * Example: 
   ```javascript
   if(Cypress.window){
