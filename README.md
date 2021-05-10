@@ -18,6 +18,7 @@ Cypress plugin for interacting with and validating against ag grid.
         - [Validate Subset of Table Data](#validate-subset-of-table-data)
         - [Validate Empty Grid](#validate-empty-grid)
   * [Limitations](#limitations)
+  * [Credit](#credit)
 <br/>
 <br/>
 
@@ -271,3 +272,5 @@ Example:
       this.api.sizeColumnsToFit();
   }
   ``` 
+## Credit
+A portion of the logic to retrieve table data was expanded upon from the project [Cypress-Get-Table](https://github.com/roggerfe/cypress-get-table) by [Rogger Fernandez](https://github.com/roggerfe).
