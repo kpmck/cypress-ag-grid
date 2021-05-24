@@ -60,7 +60,7 @@ export const getAgGridData = (agGridElement, options = {}) => {
   // Combine results from all specified tables (either single table, or all pinned columns) by index
   rows = allRows.reduce(function(a, b) {
     return a.map(function(v, i) {
-      return (v + "," + b[i]).split(",");
+      return v.concat(b[i]);
     });
   });
 }
