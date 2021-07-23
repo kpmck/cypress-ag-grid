@@ -190,7 +190,7 @@ Example:
         { "Year": "2020", "Make": "Mercedes", "Model": "GLC300" },
       ],
       [
-        { "Year": "2020", "Make: "Honda", "Model": "Civic" },
+        { "Year": "2020", "Make": "Honda", "Model": "Civic" },
         { "Year": "2020", "Make": "Honda", "Model": "Accord" },
         { "Year": "2020", "Make": "Ford", "Model": "Taurus" },
         { "Year": "2020", "Make": "Hyundai", "Model": "Elantra" },
