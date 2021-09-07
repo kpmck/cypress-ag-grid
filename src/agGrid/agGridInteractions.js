@@ -197,7 +197,6 @@ function filterBySearchTerm(agGridElement, filterValue, operator, noMenuTabs) {
       .find("span")
       .contains(operator)
       .then(($ele) => {
-        console.log('operator element', $ele)
         //Have to use the unwrapped element, since Cypress .click() event does not appropriately select the operator
         $ele.trigger('click');
       });
