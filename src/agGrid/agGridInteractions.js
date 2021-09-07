@@ -40,7 +40,7 @@ export const getAgGridData = (agGridElement, options = {}) => {
   agGridSelectors.forEach((selector) => {
     const _rows = [...tableElement.querySelectorAll(`${selector}:not(.ag-hidden) .ag-row`)]
       // Sort rows by their row-index attribute value
-      .sort(sortElementsByAttributeIndex(1))
+      .sort(sortElementsByAttributeIndex(3))
       .map((row) => {
         // Sort row cells by their aria-colindex attribute value
         return [...row.querySelectorAll(".ag-cell")]
