@@ -65,11 +65,6 @@ export const getAgGridData = (agGridElement, options = {}) => {
   });
 }
 
-  // if options.rawValues = true, return headers & rows values as arrays instead of mapping as objects
-  if (options.valuesArray) {
-    return {headers, rows};
-  }
-
   // return structured object from headers and rows variables
   return rows.map((row) =>
     row.reduce((acc, curr, idx) => {
@@ -185,10 +180,13 @@ function getFilterColumnButtonElement(
  *
  * @param filterValue value to input into the filter textbox
  * @param operator (optional) use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values)
+ * @param noMenuTabs (optional) boolean indicating if the menu has tabs.
  */
-function filterBySearchTerm(agGridElement, filterValue, operator) {
+function filterBySearchTerm(agGridElement, filterValue, operator, noMenuTabs) {
   // Navigate to the filter tab
-  selectMenuTab(agGridElement, filterTab.filter);
+  if (!noMenuTabs) { 
+    selectMenuTab(agGridElement, filterTab.filter);
+  }
   if (operator) {
     cy.get(agGridElement)
       .find(".ag-picker-field-wrapper")
@@ -199,8 +197,9 @@ function filterBySearchTerm(agGridElement, filterValue, operator) {
       .find("span")
       .contains(operator)
       .then(($ele) => {
+        console.log('operator element', $ele)
         //Have to use the unwrapped element, since Cypress .click() event does not appropriately select the operator
-        $ele.click();
+        $ele.trigger('click');
       });
   }
   // Input filter term and allow grid a moment to render the results
@@ -212,29 +211,36 @@ function filterBySearchTerm(agGridElement, filterValue, operator) {
     .wait(500);
 }
 
-function applyColumnFilter(agGridElement, hasApplyButton) {
+function applyColumnFilter(agGridElement, hasApplyButton, noMenuTabs) {
   if (hasApplyButton) {
     cy.get(agGridElement)
       .find(".ag-filter-apply-panel-button")
       .contains("Apply")
       .click();
-    getMenuTabElement(agGridElement, filterTab.filter).click();
-  } else getMenuTabElement(agGridElement, filterTab.filter).click();
+
+  }
+  if (!noMenuTabs)
+  {
+     getMenuTabElement(agGridElement, filterTab.filter).click();
+  }
 }
 
 /**
  * Either toggle
  * @param filterValue
  * @param doSelect
- * @param hasApplyButton
+ * @param hasTabs
  */
 function toggleColumnCheckboxFilter(
   agGridElement,
   filterValue,
   doSelect,
-  hasApplyButton = false
+  noMenuTabs = false
 ) {
-  selectMenuTab(agGridElement, filterTab.filter);
+  if (!noMenuTabs)
+  {
+     selectMenuTab(agGridElement, filterTab.filter);
+  }
   cy.get(agGridElement)
     .find(".ag-input-field-label")
     .contains(filterValue)
@@ -246,7 +252,7 @@ function toggleColumnCheckboxFilter(
     });
 }
 
-function populateSearchCriteria(searchCriteria, hasApplyButton = false) {
+function populateSearchCriteria(searchCriteria, hasApplyButton = false, noMenuTabs = false) {
   const options = {};
   //@ts-ignore
   options.searchCriteria = {};
@@ -256,6 +262,8 @@ function populateSearchCriteria(searchCriteria, hasApplyButton = false) {
   options.searchCriteria.filterValue = searchCriteria.filterValue;
   //@ts-ignore
   options.hasApplyButton = hasApplyButton;
+  //@ts-ignore
+  options.noMenuTabs = noMenuTabs;
   return options;
 }
 
@@ -268,6 +276,7 @@ function populateSearchCriteria(searchCriteria, hasApplyButton = false) {
  * @param options.searchCriteria.filterValue [REQUIRED] value to input into the filter textbox
  * @param options.searchCriteria.operator [Optional] Use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values).
  * @param options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
+ * @param options.noMenuTabs [Optional] True if you use for example the community edition of ag-grid, which has no menu tabs
  */
 export function filterBySearchTextColumnMenu(agGridElement, options) {
   // Check if there are multiple search criteria provided by attempting to access the columnName
@@ -275,7 +284,8 @@ export function filterBySearchTextColumnMenu(agGridElement, options) {
     options.searchCriteria.forEach((_searchCriteria) => {
       const _options = populateSearchCriteria(
         _searchCriteria,
-        options.hasApplyButton
+        options.hasApplyButton,
+        options.noMenuTabs
       );
       _filterBySearchTextColumnMenu(agGridElement, _options);
     });
@@ -293,9 +303,10 @@ function _filterBySearchTextColumnMenu(agGridElement, options) {
   filterBySearchTerm(
     agGridElement,
     options.searchCriteria.filterValue,
-    options.searchCriteria.operator
+    options.searchCriteria.operator,
+    options.noMenuTabs
   );
-  applyColumnFilter(agGridElement, options.hasApplyButton);
+  applyColumnFilter(agGridElement, options.hasApplyButton, options.noMenuTabs);
 }
 
 /**
@@ -307,14 +318,16 @@ function _filterBySearchTextColumnMenu(agGridElement, options) {
  * @param options.searchCriteria.filterValue value to input into the filter textbox
  * @param options.searchCriteria.operator [Optional] Use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values).
  * @param options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
- */
+ * @param options.noMenuTabs [Optional] True if you use for example the community edition of ag-grid, which has no menu tabs
+*/
 export function filterBySearchTextColumnFloatingFilter(agGridElement, options) {
   // Check if there are multiple search criteria provided by attempting to access the columnName
   if (!options.searchCriteria.columnName) {
     options.searchCriteria.forEach((_searchCriteria) => {
       const _options = populateSearchCriteria(
         _searchCriteria,
-        options.hasApplyButton
+        options.hasApplyButton,
+        options.noMenuTabs
       );
       _filterBySearchTextColumnFloatingFilter(agGridElement, _options);
     });
@@ -333,9 +346,10 @@ function _filterBySearchTextColumnFloatingFilter(agGridElement, options) {
     filterBySearchTerm(
       agGridElement,
       options.searchCriteria.filterValue,
-      options.searchCriteria.operator
+      options.searchCriteria.operator,
+      options.noMenuTabs
     );
-    applyColumnFilter(agGridElement, options.hasApplyButton);
+    applyColumnFilter(agGridElement, options.hasApplyButton, options.noMenuTabs);
   });
 }
 
@@ -347,6 +361,7 @@ function _filterBySearchTextColumnFloatingFilter(agGridElement, options) {
  * @param options.searchCriteria.columnName [REQUIRED] name of the column to filter
  * @param options.searchCriteria.filterValue [REQUIRED] value to input into the filter textbox
  * @param options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
+ * @param options.noMenuTabs [Optional] True if you use for example the community edition of ag-grid, which has no menu tabs
  */
 export function filterByCheckboxColumnMenu(agGridElement, options) {
   // Check if there are multiple search criteria provided by attempting to access the columnName
@@ -354,7 +369,8 @@ export function filterByCheckboxColumnMenu(agGridElement, options) {
     options.searchCriteria.forEach((_searchCriteria) => {
       const _options = populateSearchCriteria(
         _searchCriteria,
-        options.hasApplyButton
+        options.hasApplyButton,
+        otions.noMenuTabs
       );
       _filterByCheckboxColumnMenu(agGridElement, _options);
     });
@@ -373,15 +389,15 @@ function _filterByCheckboxColumnMenu(agGridElement, options) {
       agGridElement,
       "Select All",
       false,
-      options.hasApplyButton
+      options.noMenuTabs
     );
     toggleColumnCheckboxFilter(
       agGridElement,
       options.searchCriteria.filterValue,
       true,
-      options.hasApplyButton
+      options.noMenuTabs
     );
-    applyColumnFilter(agGridElement, options.hasApplyButton);
+    applyColumnFilter(agGridElement, options.hasApplyButton, options.noMenuTabs);
   });
 }
 
