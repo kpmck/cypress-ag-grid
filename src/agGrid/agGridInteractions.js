@@ -65,6 +65,11 @@ export const getAgGridData = (agGridElement, options = {}) => {
   });
 }
 
+  // if options.rawValues = true, return headers & rows values as arrays instead of mapping as objects
+  if (options.valuesArray) {
+    return {headers, rows};
+  }
+
   // return structured object from headers and rows variables
   return rows.map((row) =>
     row.reduce((acc, curr, idx) => {
