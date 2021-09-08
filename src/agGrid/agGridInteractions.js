@@ -369,7 +369,7 @@ export function filterByCheckboxColumnMenu(agGridElement, options) {
       const _options = populateSearchCriteria(
         _searchCriteria,
         options.hasApplyButton,
-        otions.noMenuTabs
+        options.noMenuTabs
       );
       _filterByCheckboxColumnMenu(agGridElement, _options);
     });
