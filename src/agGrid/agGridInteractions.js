@@ -5,13 +5,14 @@ import { filterTab } from "./menuTab.enum";
 /**
  * Uses the attribute value's index and sorts the data accordingly.
  * For our purposes, we are getting the attribute with the items' indices and sorting accordingly.
+ * 
  * @param {*} index 
  * @returns 
  */
-function sortElementsByAttributeIndex(index) {
+function sortElementsByAttributeValue(attribute) {
   return (a, b) => {
-    const contentA = parseInt(a.attributes[index].nodeValue, 10).valueOf();
-    const contentB = parseInt(b.attributes[index].nodeValue, 10).valueOf();
+    const contentA = parseInt(a.attributes[attribute].nodeValue, 10).valueOf();
+    const contentB = parseInt(b.attributes[attribute].nodeValue, 10).valueOf();
     return contentA < contentB ? -1 : contentA > contentB ? 1 : 0;
   };
 }
@@ -32,42 +33,47 @@ export const getAgGridData = (agGridElement, options = {}) => {
   const tableElement = agGridElement.get()[0].querySelectorAll(".ag-root")[0];
   const agGridSelectors = agGridColumnSelectors.split("^");
   const headers = [
-    ...tableElement.querySelectorAll(".ag-header-cell-text")
-  ].map((e) => e.textContent.trim());
+    ...tableElement.querySelectorAll('.ag-header-row-column .ag-header-cell')]
+    .sort(sortElementsByAttributeValue('aria-colindex'))
+    .map((headerElement) => {
+      return [...headerElement.querySelectorAll(".ag-header-cell-text")]
+        .map((e) => e.textContent.trim())
+    }).flat()
+
   let allRows = [];
   let rows = [];
 
   agGridSelectors.forEach((selector) => {
     const _rows = [...tableElement.querySelectorAll(`${selector}:not(.ag-hidden) .ag-row`)]
       // Sort rows by their row-index attribute value
-      .sort(sortElementsByAttributeIndex(3))
+      .sort(sortElementsByAttributeValue("row-index"))
       .map((row) => {
         // Sort row cells by their aria-colindex attribute value
         return [...row.querySelectorAll(".ag-cell")]
-          .sort(sortElementsByAttributeIndex(3))
+          .sort(sortElementsByAttributeValue("aria-colindex"))
           .map((e) => e.textContent.trim());
       });
     allRows.push(_rows);
   });
 
   // Remove any empty arrays before merging
-  allRows = allRows.filter(function(ele){
+  allRows = allRows.filter(function (ele) {
     return ele.length
   })
 
-  if(!allRows.length) rows = [];
-  else{
-  // Combine results from all specified tables (either single table, or all pinned columns) by index
-  rows = allRows.reduce(function(a, b) {
-    return a.map(function(v, i) {
-      return v.concat(b[i]);
+  if (!allRows.length) rows = [];
+  else {
+    // Combine results from all specified tables (either single table, or all pinned columns) by index
+    rows = allRows.reduce(function (a, b) {
+      return a.map(function (v, i) {
+        return v.concat(b[i]);
+      });
     });
-  });
-}
+  }
 
   // if options.rawValues = true, return headers & rows values as arrays instead of mapping as objects
   if (options.valuesArray) {
-    return {headers, rows};
+    return { headers, rows };
   }
 
   // return structured object from headers and rows variables
@@ -189,7 +195,7 @@ function getFilterColumnButtonElement(
  */
 function filterBySearchTerm(agGridElement, filterValue, operator, noMenuTabs) {
   // Navigate to the filter tab
-  if (!noMenuTabs) { 
+  if (!noMenuTabs) {
     selectMenuTab(agGridElement, filterTab.filter);
   }
   if (operator) {
@@ -223,9 +229,8 @@ function applyColumnFilter(agGridElement, hasApplyButton, noMenuTabs) {
       .click();
 
   }
-  if (!noMenuTabs)
-  {
-     getMenuTabElement(agGridElement, filterTab.filter).click();
+  if (!noMenuTabs) {
+    getMenuTabElement(agGridElement, filterTab.filter).click();
   }
 }
 
@@ -241,9 +246,8 @@ function toggleColumnCheckboxFilter(
   doSelect,
   noMenuTabs = false
 ) {
-  if (!noMenuTabs)
-  {
-     selectMenuTab(agGridElement, filterTab.filter);
+  if (!noMenuTabs) {
+    selectMenuTab(agGridElement, filterTab.filter);
   }
   cy.get(agGridElement)
     .find(".ag-input-field-label")
