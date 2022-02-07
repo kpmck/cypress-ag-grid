@@ -128,7 +128,7 @@ describe("ag-grid scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData, true);
       });
   });
 
