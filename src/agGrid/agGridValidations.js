@@ -2,12 +2,24 @@ export function validateEmptyTable(agGridElement, actualTableData){
     expect(actualTableData).to.be.empty;
 }
 
-export function validateTableExactOrder(agGridElement, actualTableData,expectedTableData){
-    expect(actualTableData, `The expected table data did not match the actual table data`).to.deep.equal(expectedTableData);
+export function validateTableExactOrder(agGridElement, actualTableData,expectedTableData, showFullError = true){
+    let errorMessage = `The expected table data did not match the actual table data`
+
+    if(showFullError){
+        errorMessage = errorMessage + ` \r\nEXPECTED:\r\n${JSON.stringify(expectedTableData)}\r\nACTUAL:\r\n:${JSON.stringify(actualTableData)}`
+    }
+
+    expect(actualTableData, errorMessage).to.deep.equal(expectedTableData);
 }
 
-export function validateTableRowSubset(agGridElement, actualTableData,expectedTableData){
-    expectedTableData.forEach((item)=> expect(actualTableData).to.deep.include(item));
+export function validateTableRowSubset(agGridElement, actualTableData,expectedTableData, showFullError = true){
+    let errorMessage = `The expected item does not exist in the actual table data`
+
+    if(showFullError){
+        errorMessage = errorMessage + ` \r\nEXPECTED:\r\n${JSON.stringify(expectedTableData)}\r\nACTUAL:\r\n:${JSON.stringify(actualTableData)}`
+    }
+
+    expectedTableData.forEach((item)=> expect(actualTableData, errorMessage).to.deep.include(item));
 }
 
 export function validateTablePages(agGridElement,expectedPaginatedTableData, onlyColumns = {}) {
@@ -17,7 +29,7 @@ export function validateTablePages(agGridElement,expectedPaginatedTableData, onl
             .getAgGridData(onlyColumns)
             .then((table) => {
                 const actualPage = JSON.parse(JSON.stringify(table));
-                validateTableExactOrder(agGridElement, actualPage, expectedPage);
+                validateTableExactOrder(agGridElement, actualPage, expectedPage, true);
                 cy.get(".ag-icon-next").click();
                 iterator++;
             });
