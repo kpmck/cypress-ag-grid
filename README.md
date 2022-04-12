@@ -5,7 +5,7 @@ Cypress plugin for interacting with and validating against ag grid.
   * [Installation](#installation)
   * [Usage](#usage)
     + [Grid Interaction](#)
-        - [Getting Data From the Grid](#getting-data-from-the-grid-)
+        - [Getting Data From the Grid](#getting-data-from-the-grid)
         - [Getting Select Row Data](#getting-select-row-data)
         - [Sorting Columns](#sorting-columns)
         - [Filter by Text - Column Menu](#filter-by-text---column-menu)
