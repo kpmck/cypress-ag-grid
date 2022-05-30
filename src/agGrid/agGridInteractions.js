@@ -33,11 +33,18 @@ export const getAgGridData = (agGridElement, options = {}) => {
   const tableElement = agGridElement.get()[0].querySelectorAll(".ag-root")[0];
   const agGridSelectors = agGridColumnSelectors.split("^");
   const headers = [
-    ...tableElement.querySelectorAll('.ag-header-row-column .ag-header-cell')]
+    ...tableElement.querySelectorAll('.ag-header-row-column [aria-colindex]')]
     .sort(sortElementsByAttributeValue('aria-colindex'))
     .map((headerElement) => {
-      return [...headerElement.querySelectorAll(".ag-header-cell-text")]
-        .map((e) => e.textContent.trim())
+      // Check if the elements returned are already .ag-header-cell-text elements
+      // If not, query for that element and return the text content
+      let headerCells = [...headerElement.querySelectorAll(".ag-header-cell-text")]
+      if (headerCells.length === 0) {
+        return [headerElement].map((e) => e.textContent.trim())
+      } else {
+        return [...headerElement.querySelectorAll(".ag-header-cell-text")]
+          .map((e) => e.textContent.trim())
+      }
     }).flat()
 
   let allRows = [];
@@ -49,9 +56,14 @@ export const getAgGridData = (agGridElement, options = {}) => {
       .sort(sortElementsByAttributeValue("row-index"))
       .map((row) => {
         // Sort row cells by their aria-colindex attribute value
-        return [...row.querySelectorAll(".ag-cell")]
-          .sort(sortElementsByAttributeValue("aria-colindex"))
-          .map((e) => e.textContent.trim());
+        // First check if elements returned already contain the aria-colindex
+        // If not, just query for the .ag-cell
+        let rowCells = [...row.querySelectorAll(".ag-cell [aria-colindex]")]
+        if (rowCells.length === 0) {
+          rowCells = [...row.querySelectorAll(".ag-cell")]
+        }
+        return rowCells.sort(sortElementsByAttributeValue("aria-colindex"))
+        .map((e)=> e.textContent.trim())
       });
     allRows.push(_rows);
   });
