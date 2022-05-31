@@ -83,7 +83,7 @@ export const getAgGridData = (agGridElement, options = {}) => {
     });
   }
 
-  // if options.rawValues = true, return headers & rows values as arrays instead of mapping as objects
+  // if options.valuesArray = true, return headers & rows values as arrays instead of mapping as objects
   if (options.valuesArray) {
     return { headers, rows };
   }
