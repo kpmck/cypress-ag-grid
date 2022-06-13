@@ -9,6 +9,6 @@ orbs:
   # to lock the version and prevent unexpected CI changes
   cypress: cypress-io/cypress@2.0.0
 workflows:
-  build:
+  run_cypress_tests:
     jobs:
       - cypress/run # "run" job comes from "cypress" orb
