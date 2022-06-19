@@ -98,6 +98,7 @@ describe("ag-grid scenarios", () => {
         columnName: "Model",
         filterValue: "2002",
       },
+      selectAllLocaleText: 'Select All', // This is optional if you are using localText for ag grid
       hasApplyButton: true,
     });
     cy.get(agGridSelector)
