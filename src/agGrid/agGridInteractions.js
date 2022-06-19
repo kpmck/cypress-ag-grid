@@ -405,9 +405,10 @@ function _filterByCheckboxColumnMenu(agGridElement, options) {
       agGridElement,
       options.searchCriteria.columnName
     ).click();
+    const selectAllText = options.selectAllLocaleText || 'Select All'
     toggleColumnCheckboxFilter(
       agGridElement,
-      "Select All",
+      selectAllText,
       false,
       options.noMenuTabs
     );
