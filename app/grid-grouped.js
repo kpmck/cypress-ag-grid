@@ -1,12 +1,12 @@
 // specify the columns
-const columnDefs = [
-  { field: "year", pinned: "left" },
-  { field: "make", rowGroup: false, pinned: "left" },
+const columnDefsGrouped = [
+  { field: "year", pivot: true, },
+  { field: "make", rowGroup: true, enableRowGroup: true, aggFunc: 'sum' },
   { field: "model", filter: true },
-  { field: "price", pinned: "right", floatingFilter: false, sortable: false },
+  { field: "price", editable: true, cellEditor: 'agTextCellEditor'  },
 ];
 
-const autoGroupColumnDef = {
+const autoGroupColumnDefGrouped = {
   headerName: "Model",
   field: "model",
   cellRenderer: "agGroupCellRenderer",
@@ -16,7 +16,7 @@ const autoGroupColumnDef = {
 };
 
 // let the grid know which columns to use
-const gridOptions = {
+const gridOptionsGrouped = {
   defaultColDef: {
     sortable: true,
     filter: "agTextColumnFilter",
@@ -28,21 +28,22 @@ const gridOptions = {
     animateRows: true,
     resizable: true,
   },
-  autoGroupColumnDef: autoGroupColumnDef,
+  groupDefaultExpanded: 2,
+  autoGroupColumnDef: autoGroupColumnDefGrouped,
   groupSelectsChildren: true,
-  columnDefs: columnDefs,
+  columnDefs: columnDefsGrouped,
   rowSelection: "multiple",
   domLayout: "normal",
   pagination: true,
   paginationPageSize: 5,
-  sideBar: true,
+  sideBar: false,
 };
 
 // lookup the container we want the Grid to use
-const eGridDiv = document.querySelector("#myGrid");
+const eGridDivGrouped = document.querySelector("#myGrid2");
 
 // create the grid passing in the div to use together with the columns &amp; data we want to use
-new agGrid.Grid(eGridDiv, gridOptions);
+new agGrid.Grid(eGridDivGrouped, gridOptionsGrouped);
 
 // Grab the grid data from the supplied API endpoint
 agGrid
@@ -50,20 +51,20 @@ agGrid
     url: "https://api.jsonbin.io/b/608304f69a9aa933335613a6/2",
   })
   .then((data) => {
-    gridOptions.api.setRowData(data);
+    gridOptionsGrouped.api.setRowData(data);
   });
 
 function autoSizeAllColumns() {
   var allColumnIds = [];
-  gridOptions.columnApi.getAllColumns().forEach(function (column) {
+  gridOptionsGrouped.columnApi.getAllColumns().forEach(function (column) {
     allColumnIds.push(column.colId);
   });
-  gridOptions.columnApi.autoSizeColumns(allColumnIds);
+  gridOptionsGrouped.columnApi.autoSizeColumns(allColumnIds);
 }
 
 // If the Cypress test is running, ensure all columns fit within the window
 if (window.Cypress) {
-  gridOptions.api.sizeColumnsToFit();
+  gridOptionsGrouped.api.sizeColumnsToFit();
 } else {
     // Otherwise auto-size columns the way we wish to view the grid in production.
     autoSizeAllColumns();
