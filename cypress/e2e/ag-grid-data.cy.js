@@ -104,7 +104,7 @@ describe("ag-grid get data scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData)
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
       });
   });
 
@@ -130,11 +130,7 @@ describe("ag-grid get data scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsExactOrder(
-          actualTableData,
-          expectedTableData,
-          true
-        );
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData, true);
       });
   });
 
@@ -156,7 +152,7 @@ describe("ag-grid get data scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
       });
   });
 
@@ -183,7 +179,7 @@ describe("ag-grid get data scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
       });
   });
 
@@ -205,7 +201,7 @@ describe("ag-grid get data scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
       });
   });
 
@@ -235,7 +231,7 @@ describe("ag-grid get data scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
       });
   });
 
@@ -277,7 +273,7 @@ describe("ag-grid get data scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateEmptyTable(actualTableData);
+        cy.agGridValidateEmptyTable(actualTableData);
       });
   });
 
@@ -296,7 +292,7 @@ describe("ag-grid get data scenarios", () => {
       cy.get(agGridSelector)
         .getAgGridData()
         .then((actualTableData) => {
-          cy.get(agGridSelector).agGridValidateRowsExactOrder(
+          cy.agGridValidateRowsExactOrder(
             actualTableData,
             expectedData_sortedByAscending
           );
@@ -319,7 +315,7 @@ describe("ag-grid get data scenarios", () => {
       cy.get(agGridSelector)
         .getAgGridData()
         .then((actualTableData) => {
-          cy.get(agGridSelector).agGridValidateRowsExactOrder(
+          cy.agGridValidateRowsExactOrder(
             actualTableData,
             expectedData_sortedByDescending
           );
@@ -337,7 +333,7 @@ describe("ag-grid get data scenarios", () => {
       cy.get(agGridSelector)
         .getAgGridData()
         .then((actualTableData) => {
-          cy.get(agGridSelector).agGridValidateRowsExactOrder(
+          cy.agGridValidateRowsExactOrder(
             actualTableData,
             expectedData_yearColumnRemoved.slice(0, _pageSize)
           );
@@ -356,7 +352,7 @@ describe("ag-grid get data scenarios", () => {
       cy.get(agGridSelector)
         .getAgGridData()
         .then((actualTableData) => {
-          cy.get(agGridSelector).agGridValidateRowsExactOrder(
+          cy.agGridValidateRowsExactOrder(
             actualTableData,
             expectedData_priceColumnRemoved.slice(0, _pageSize)
           );
@@ -375,7 +371,7 @@ describe("ag-grid get data scenarios", () => {
       cy.get(agGridSelector)
         .getAgGridData()
         .then((actualTableData) => {
-          cy.get(agGridSelector).agGridValidateRowsExactOrder(
+          cy.agGridValidateRowsExactOrder(
             actualTableData,
             expectedData_multipleColumnsRemoved.slice(0, _pageSize)
           );
@@ -394,7 +390,7 @@ describe("ag-grid get data scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData({ onlyColumns: ["Year", "Make", "Model"] })
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsSubset(actualTableData, expectedTableData);
+        cy.agGridValidateRowsSubset(actualTableData, expectedTableData);
       });
   });
 });
