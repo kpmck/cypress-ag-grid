@@ -268,7 +268,7 @@ Example:
   * To combat this, in your code where the ag grid is called, check if the Cypress window is controlling the app and set the ag grid object to `.sizeColumnsToFit()`. You can see an example of this in the `app/grid.js` file of this repository. Read more [here](https://www.ag-grid.com/javascript-grid/column-sizing/#size-columns-to-fit)
   * Example: 
   ```javascript
-  if(Cypress.window){
+  if(window.Cypress){
       this.api.sizeColumnsToFit();
   }
   ``` 
