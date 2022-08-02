@@ -70,7 +70,7 @@ The correct command will return the following:
 To only get certain rows of data, pass the header values into the `getAgGridData()` command, like so:
 
 ```javascript
-cy.get("#myGrid).getAgGridData({ onlyColumns: ["Year", "Make"] })
+cy.get("#myGrid").getAgGridData({ onlyColumns: ["Year", "Make"] })
 ```
 
 The above command will return the follwoing:
