@@ -256,6 +256,7 @@ function filterBySearchTerm(agGridElement, filterValue, operator, noMenuTabs) {
     .find(".ag-popup-child")
     .find("input")
     .filter(":visible")
+    .clear()
     .type(filterValue)
     .wait(500);
 }
