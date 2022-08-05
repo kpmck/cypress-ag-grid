@@ -1,7 +1,7 @@
 // specify the columns
 const columnDefsGrouped = [
   { field: "year", pivot: true, },
-  { field: "make", rowGroup: true, enableRowGroup: true, aggFunc: 'sum' },
+  { field: "make", rowGroup: true, enableRowGroup: true },
   { field: "model", filter: true },
   { field: "price", editable: true, cellEditor: 'agTextCellEditor'  },
 ];
@@ -48,10 +48,10 @@ new agGrid.Grid(eGridDivGrouped, gridOptionsGrouped);
 // Grab the grid data from the supplied API endpoint
 agGrid
   .simpleHttpRequest({
-    url: "https://api.jsonbin.io/b/608304f69a9aa933335613a6/2",
+    url: "https://api.jsonbin.io/v3/b/608304f69a9aa933335613a6/2",
   })
   .then((data) => {
-    gridOptionsGrouped.api.setRowData(data);
+    gridOptionsGrouped.api.setRowData(data.record);
   });
 
 function autoSizeAllColumns() {
