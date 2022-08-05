@@ -2,7 +2,8 @@
 
 declare namespace Cypress {
     interface Chainable<Subject> {
-        getAgGridData<E extends Node = HTMLElement>(options?: {}): Chainable<JQuery<E>>;
+        getAgGridData(options?: {}): Chainable<Array<Record<string, string>>>;
+        getAgGridElements<E extends Node = HTMLElement>(options?: {}): Chainable<JQuery<E>>;
         /**
          *  * Performs sorting operation on the specified column
          * @param {*} subject The get() selector for which ag grid table you wish to retrieve.
