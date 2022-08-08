@@ -70,7 +70,7 @@ The correct command will return the following:
 To only get certain rows of data, pass the header values into the `getAgGridData()` command, like so:
 
 ```javascript
-cy.get("#myGrid).getAgGridData({ onlyColumns: ["Year", "Make"] })
+cy.get("#myGrid").getAgGridData({ onlyColumns: ["Year", "Make"] })
 ```
 
 The above command will return the follwoing:
@@ -128,13 +128,48 @@ The above command will filter the Model column for the value 'GLC300' and set th
 </br>
 </br>
 ### Filterby Text - Floating Filter
-This command will filter a column by a text value from its floating filter (if applicable).
+This command will filter a column by a text value from its floating filter (if applicable). This command will filter a column by a text value from its floating menu. In the options, you must specify a `searchCriteria` object with `columnName`, `filterValue`, and optionally `operator` (i.e. Contains, Not contains, Equals, etc.) and `searchInputIndex` in the event you wish to apply multiple text conditions (see below for multi-condition example).
 
 ![alt text](./ag-grid-example-filter-text-floating.png "AG Grid Dom - Filter by Text Floating")
 
-<b>Definition:</b> .agGridColumnFilterTextMenu(options: {})
+<b>Definition:</b> .agGridColumnFilterTextFloating(options: {})
 
-See [Filter by Text - Column Menu](#filter-by-Text---Column-Menu) for example and usage.
+Example:
+```
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: {
+        columnName: "Make",
+        filterValue: "Ford",
+      },
+      hasApplyButton: true,
+    });
+```
+
+The above example will search for the Make `Ford` from the floating text menu filter.
+
+If you have the option for multiple conditions on the floating filter, you can do two searches, specifying the `searchInputIndex` parameter in the `searchCriteria` object. The below example will ssarch for any `Make` that contains `B` AND `MW`:
+
+Example: 
+```
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: {
+        columnName: "Make",
+        filterValue: "B",
+        searchInputIndex: 0,
+      },
+      hasApplyButton: true,
+    });
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: {
+        columnName: "Make",
+        filterValue: "MW",
+        searchInputIndex: 1,
+      },
+      hasApplyButton: true,
+    });
+```
+![alt text](./ag-grid-example-filter-text-floating-multi-condition.png "AG Grid Dom - Filter by Text Floating")
+
 <br/>
 </br>
 

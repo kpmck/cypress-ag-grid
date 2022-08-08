@@ -205,7 +205,12 @@ function getFilterColumnButtonElement(
  * @param operator (optional) use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values)
  * @param noMenuTabs (optional) boolean indicating if the menu has tabs.
  */
-function filterBySearchTerm(agGridElement, filterValue, operator, noMenuTabs) {
+ function filterBySearchTerm(agGridElement, options) {
+  const filterValue = options.searchCriteria.filterValue;
+  const operator = options.searchCriteria.operator;
+  const searchInputIndex = options.searchCriteria.searchInputIndex || 0;
+  const noMenuTabs = options.noMenuTabs;
+  
   // Navigate to the filter tab
   if (!noMenuTabs) {
     selectMenuTab(agGridElement, filterTab.filter);
@@ -229,6 +234,8 @@ function filterBySearchTerm(agGridElement, filterValue, operator, noMenuTabs) {
     .find(".ag-popup-child")
     .find("input")
     .filter(":visible")
+    .eq(searchInputIndex)
+    .clear()
     .type(filterValue)
     .wait(500);
 }
@@ -322,9 +329,7 @@ function _filterBySearchTextColumnMenu(agGridElement, options) {
   ).click();
   filterBySearchTerm(
     agGridElement,
-    options.searchCriteria.filterValue,
-    options.searchCriteria.operator,
-    options.noMenuTabs
+    options
   );
   applyColumnFilter(agGridElement, options.hasApplyButton, options.noMenuTabs);
 }
@@ -336,6 +341,7 @@ function _filterBySearchTextColumnMenu(agGridElement, options) {
  * @param options.searchCriteria JSON with search properties and options
  * @param options.searchCriteria.columnName name of the column to filter
  * @param options.searchCriteria.filterValue value to input into the filter textbox
+ * @param options.searchCriteria.searchInputIndex [Optional] Uses 0 by default. Index of which filter box to use in event of having multiple search conditionals
  * @param options.searchCriteria.operator [Optional] Use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values).
  * @param options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
  * @param options.noMenuTabs [Optional] True if you use for example the community edition of ag-grid, which has no menu tabs
@@ -365,9 +371,7 @@ function _filterBySearchTextColumnFloatingFilter(agGridElement, options) {
     ).click();
     filterBySearchTerm(
       agGridElement,
-      options.searchCriteria.filterValue,
-      options.searchCriteria.operator,
-      options.noMenuTabs
+      options
     );
     applyColumnFilter(agGridElement, options.hasApplyButton, options.noMenuTabs);
   });
