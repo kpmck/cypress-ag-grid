@@ -30,7 +30,7 @@ export function validateTablePages(agGridElement,expectedPaginatedTableData, onl
             .then((table) => {
                 const actualPage = JSON.parse(JSON.stringify(table));
                 validateTableExactOrder(agGridElement, actualPage, expectedPage, true);
-                cy.get(agGridElement).find(".ag-icon-next").click();
+                cy.get(".ag-icon-next").click();
                 iterator++;
             });
     });
