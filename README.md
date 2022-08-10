@@ -286,7 +286,7 @@ Example:
 cy.get("#myGrid")
 .getAgGridData()
 .then((actualTableData) => {
-    cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+    cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
 });
 ```
 <br/>
@@ -309,7 +309,7 @@ Example:
     cy.get(agGridSelector)
       .getAgGridData({ onlyColumns: ["Year", "Make", "Model"] })
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsSubset(actualTableData, expectedTableData);
+        cy.agGridValidateRowsSubset(actualTableData, expectedTableData);
       });
   });
 ```
@@ -326,7 +326,7 @@ Example:
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateEmptyTable(actualTableData);
+        cy.agGridValidateEmptyTable(actualTableData);
       });
 ```
 
