@@ -7,10 +7,12 @@ Cypress plugin for interacting with and validating against ag grid.
     + [Grid Interaction](#)
         - [Getting Data From the Grid](#getting-data-from-the-grid)
         - [Getting Select Row Data](#getting-select-row-data)
+        - [Getting Elements From the Grid](#getting-elements-from-the-grid)
         - [Sorting Columns](#sorting-columns)
         - [Filter by Text - Column Menu](#filter-by-text---column-menu)
         - [Filterby Text - Floating Filter](#filterby-text---floating-filter)
         - [Filter by Checkbox - Column Menu](#filter-by-checkbox---column-menu)
+        - [Filtering - Localization and Internationalization](#filtering---localization-and-internationalization)
         - [Add or Remove Columns](#add-or-remove-columns)
     + [Grid Validation](#)
         - [Validate Paginated Table](#validate-paginated-table)
@@ -83,6 +85,25 @@ The above command will return the follwoing:
     { "Year": "2020", "Make": "Mercedes"},
 ]
 ```
+</br>
+</br>
+
+### Getting Elements From the Grid
+To get the Ag Grid data as elements (if you want to interact with the cells themselves), you must chain `.getAgGridElements()` after the `cy.get()` command for the topmost level of the grid, including controls and headers (see selected DOM element in above image).
+```javascript
+    cy.get(agGridSelector)
+      .getAgGridElements()
+      .then((tableElements) => {
+        const porscheRow = tableElements.find(
+          (row) => row.Price.innerText === "72000"
+        );
+        const priceCell = porscheRow.Price;
+        cy.wrap(priceCell).dblclick().type("66000{enter}");
+      });
+
+```
+
+The above example will grab the table as elements, finds the row whose `Price` equals `72000`. It then gets the `Price` cell for that row, double clicks on it to enable an editable input, and changes the value of the cell.
 </br>
 </br>
 
@@ -194,6 +215,20 @@ Example:
 
 ```
 </br>
+
+### Filtering - Localization and Internationalization
+When we filter by checkbox, we first deselect the Select All checkbox to ensure we ONLY select the specified checkbox. Since AG grid allows for localization, we need a way to be able to pass in the localeText for Select All. This is the only area of this plugin that has a hard-coded value, so no other localization accommodations are needed.
+
+```
+    cy.get("#myGrid").agGridColumnFilterCheckboxMenu({
+      searchCriteria: {
+        columnName: "Model",
+        filterValue: "2002",
+      },
+      selectAllLocaleText: "Tout Sélectionner"
+      hasApplyButton: true,
+    });
+```   
 </br>
 
 ### Add or Remove Columns
