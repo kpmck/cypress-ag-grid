@@ -331,8 +331,8 @@ Example:
 ```
 
 ## Limitations
-* Unable to validate deeply nested row groups
-* Unable to validate deeply nested column groups
+* ~~Unable to validate deeply nested row groups~~ As of v2.x, using `.getAgGridElements()` you should be able to accomplish this.
+* ~~Unable to validate deeply nested column groups~~ As of v2.x, using `.getAgGridElements()` you should be able to accomplish this.
 * Unable to validate the entirety of an unlimited scrolling grid.
 * Unable to validate data that is out of view. The DOM will register the ag grid data as it's scrolled into view.
   * To combat this, in your code where the ag grid is called, check if the Cypress window is controlling the app and set the ag grid object to `.sizeColumnsToFit()`. You can see an example of this in the `app/grid.js` file of this repository. Read more [here](https://www.ag-grid.com/javascript-grid/column-sizing/#size-columns-to-fit)
