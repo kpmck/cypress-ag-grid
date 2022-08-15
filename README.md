@@ -9,6 +9,8 @@ Cypress plugin for interacting with and validating against ag grid.
         - [Getting Select Row Data](#getting-select-row-data)
         - [Getting Elements From the Grid](#getting-elements-from-the-grid)
         - [Sorting Columns](#sorting-columns)
+    + [Grid Filtering](#)
+        - [Filter Options](#filter-options)
         - [Filter by Text - Column Menu](#filter-by-text---column-menu)
         - [Filterby Text - Floating Filter](#filterby-text---floating-filter)
         - [Filter by Checkbox - Column Menu](#filter-by-checkbox---column-menu)
@@ -120,6 +122,34 @@ cy.get("#myGrid").agGridSortColumn("Model", "descending");
 ```
 </br>
 </br>
+
+### Filter Options
+
+The below filtering commands takes an `options` parameter comprised of the following properties:
+
+```javascript
+options: {
+    searchCriteria: [{
+        columnName: string;
+        filterValue: string;
+        operator?: string;
+    }];
+    hasApplyButton?: boolean;
+    noMenuTab?: boolean;
+    selectAllLocaleText: string;
+}
+
+/**
+- options.searchCriteria JSON with search properties and options
+- options.searchCriteria.columnName name of the column to filter
+- options.searchCriteria.filterValue value to input into the filter textbox
+- options.searchCriteria.searchInputIndex [Optional] Uses 0 by default. Index of which filter box to use in event of having multiple search conditionals
+- options.searchCriteria.operator [Optional] Use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values).
+- options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
+- options.noMenuTabs [Optional] True if you use, for example, the community edition of ag-grid, which has no menu tabs
+- options.selectAllLocaleText [Optional] Pass in the locale text value of "Select All" for when you are filtering by checkbox - this wil first deselect the "Select All" option before selecting your filter value
+*/
+```
 
 ### Filter by Text - Column Menu
 This command will filter a column by a text value from its menu. In the options, you must specify a `searchCriteria` objects containing one or more objects with `columnName`, `filterValue`, and optionally `operator` (i.e. Contains, Not contains, Equals, etc.).

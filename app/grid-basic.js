@@ -1,6 +1,6 @@
 // specify the columns
 const columnDefs = [
-  { field: "year", pinned: "left" },
+  { field: "year", pinned: "left"},
   { field: "make", rowGroup: false, pinned: "left" },
   { field: "model", filter: true },
   { field: "price", pinned: "right", floatingFilter: false, sortable: false, editable: true, cellEditor: 'agTextCellEditor'  },

@@ -260,6 +260,30 @@ describe("ag-grid get data scenarios", () => {
       });
   });
 
+  it("able to filter by text - floating filter - multi filter", () => {
+    const expectedTableData = [
+      { Year: "2020", Make: "Ford", Model: "Taurus", Price: "19000" },
+      { Year: "1990", Make: "Ford", Model: "Taurus", Price: "900" },
+    ];
+    cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: [
+        {
+          columnName: "Model",
+          filterValue: "Taurus",
+          isMultiFilter: true
+        },
+      ],
+      hasApplyButton: true,
+    });
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+      });
+  });
+
+
   it("able to validate empty table", () => {
     //Search for an entry that does not exist
     cy.get(agGridSelector).agGridColumnFilterTextMenu({
