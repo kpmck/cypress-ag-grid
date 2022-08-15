@@ -236,6 +236,7 @@ function getFilterColumnButtonElement(
   const filterValue = options.searchCriteria.filterValue;
   const operator = options.searchCriteria.operator;
   const searchInputIndex = options.searchCriteria.searchInputIndex || 0;
+  const isMultiFilter = options.searchCriteria.isMultiFilter;
   const noMenuTabs = options.noMenuTabs;
   
   // Navigate to the filter tab
@@ -261,10 +262,32 @@ function getFilterColumnButtonElement(
     .find(".ag-popup-child")
     .find("input")
     .filter(":visible")
-    .eq(searchInputIndex)
-    .clear()
-    .type(filterValue)
-    .wait(500);
+    .as("filterInput")
+
+    // If it's a multi filter, de-select the 'select-all' checkbox
+    if(isMultiFilter){
+      const selectAllText = options.selectAllLocaleText || "Select All";
+      toggleColumnCheckboxFilter(
+        agGridElement,
+        selectAllText,
+        false,
+        true
+      );
+    }
+
+    // Get the saved filter input and enter the search term
+    cy.get("@filterInput").then(($ele)=>{
+      cy.wrap($ele)
+      .eq(searchInputIndex)
+      .clear()
+      .type(filterValue)
+      .wait(500);  
+    })
+
+    // Finally, if a multi-filter, select the filter value's checkbox
+    if(isMultiFilter){
+      toggleColumnCheckboxFilter(agGridElement, filterValue, true, true)
+    }
 }
 
 function applyColumnFilter(agGridElement, hasApplyButton, noMenuTabs) {
@@ -308,8 +331,9 @@ function toggleColumnCheckboxFilter(
 function populateSearchCriteria(
   searchCriteria,
   hasApplyButton = false,
-  noMenuTabs = false
-) {
+  noMenuTabs = false,
+  selectAllLocaleText = 'Select All'
+  ) {
   const options = {};
   //@ts-ignore
   options.searchCriteria = {};
@@ -317,6 +341,10 @@ function populateSearchCriteria(
   options.searchCriteria.columnName = searchCriteria.columnName;
   //@ts-ignore
   options.searchCriteria.filterValue = searchCriteria.filterValue;
+  //@ts-ignore
+  options.searchCriteria.isMultiFilter = searchCriteria.isMultiFilter;
+  //@ts-ignore
+  options.selectAllLocaleText = selectAllLocaleText;
   //@ts-ignore
   options.hasApplyButton = hasApplyButton;
   //@ts-ignore
@@ -342,7 +370,8 @@ export function filterBySearchTextColumnMenu(agGridElement, options) {
       const _options = populateSearchCriteria(
         _searchCriteria,
         options.hasApplyButton,
-        options.noMenuTabs
+        options.noMenuTabs,
+        options.isMultiFilter
       );
       _filterBySearchTextColumnMenu(agGridElement, _options);
     });
@@ -367,14 +396,15 @@ function _filterBySearchTextColumnMenu(agGridElement, options) {
 /**
  *  * Performs a filter operation on the specified column via the column's floating filter field using plain text search
  * @param agGridElement The get() selector for which ag grid table you wish to retrieve.
- * @param {{searchCriteria:[{columnName:string,filterValue:string,operator?:string}], hasApplyButton?:boolean}} options JSON with search properties
+ * @param {{searchCriteria:[{columnName:string,filterValue:string,operator?:string}], hasApplyButton?:boolean, noMenuTab?:boolean, selectAllLocaleText:string}} options JSON with search properties
  * @param options.searchCriteria JSON with search properties and options
  * @param options.searchCriteria.columnName name of the column to filter
  * @param options.searchCriteria.filterValue value to input into the filter textbox
  * @param options.searchCriteria.searchInputIndex [Optional] Uses 0 by default. Index of which filter box to use in event of having multiple search conditionals
  * @param options.searchCriteria.operator [Optional] Use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values).
  * @param options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
- * @param options.noMenuTabs [Optional] True if you use for example the community edition of ag-grid, which has no menu tabs
+ * @param options.noMenuTabs [Optional] True if you use, for example, the community edition of ag-grid, which has no menu tabs
+ * @param options.selectAllLocaleText [Optional] Pass in the locale text value of "Select All" for when you are filtering by checkbox - this wil first deselect the "Select All" option before selecting your filter value
  */
 export function filterBySearchTextColumnFloatingFilter(agGridElement, options) {
   // Check if there are multiple search criteria provided by attempting to access the columnName

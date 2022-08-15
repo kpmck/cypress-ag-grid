@@ -44,6 +44,7 @@ declare namespace Cypress {
          * @param options.searchCriteria.columnName name of the column to filter
          * @param options.searchCriteria.filterValue value to input into the filter textbox
          * @param options.searchCriteria.operator [Optional] Use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values).
+         * @param options.searchCriteria.isMultiFilter [Optional] Use if floating filter is multiselect checkboxes vs free form input.
          * @param options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
          */
         agGridColumnFilterTextFloating<E extends Node = HTMLElement>(options: {}): Chainable<JQuery<E>>;
