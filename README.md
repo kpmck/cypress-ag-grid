@@ -133,6 +133,7 @@ options: {
         columnName: string;
         filterValue: string;
         operator?: string;
+        isMultiFilter?: boolean;
     }];
     hasApplyButton?: boolean;
     noMenuTab?: boolean;
@@ -145,9 +146,10 @@ options: {
 - options.searchCriteria.filterValue value to input into the filter textbox
 - options.searchCriteria.searchInputIndex [Optional] Uses 0 by default. Index of which filter box to use in event of having multiple search conditionals
 - options.searchCriteria.operator [Optional] Use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values).
+- options.searchCriteria.isMultiFilter [Optional] Used when floating filter menu has checkbox options vs freeform text input.
 - options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
 - options.noMenuTabs [Optional] True if you use, for example, the community edition of ag-grid, which has no menu tabs
-- options.selectAllLocaleText [Optional] Pass in the locale text value of "Select All" for when you are filtering by checkbox - this wil first deselect the "Select All" option before selecting your filter value
+- options.selectAllLocaleText [Optional] Pass in the locale text value of "Select All" for when you are filtering by checkbox - this will first deselect the "Select All" option before selecting your filter value
 */
 ```
 
