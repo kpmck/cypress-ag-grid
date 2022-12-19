@@ -1,9 +1,9 @@
 // specify the columns
 const columnDefs = [
-  { field: "year", pinned: "left" },
+  { field: "year", pinned: "left"},
   { field: "make", rowGroup: false, pinned: "left" },
   { field: "model", filter: true },
-  { field: "price", pinned: "right", floatingFilter: false, sortable: false },
+  { field: "price", pinned: "right", floatingFilter: false, sortable: false, editable: true, cellEditor: 'agTextCellEditor'  },
 ];
 
 const autoGroupColumnDef = {
@@ -47,10 +47,10 @@ new agGrid.Grid(eGridDiv, gridOptions);
 // Grab the grid data from the supplied API endpoint
 agGrid
   .simpleHttpRequest({
-    url: "https://api.jsonbin.io/b/608304f69a9aa933335613a6/2",
+    url: "https://api.jsonbin.io/v3/b/608304f69a9aa933335613a6/2",
   })
   .then((data) => {
-    gridOptions.api.setRowData(data);
+    gridOptions.api.setRowData(data.record);
   });
 
 function autoSizeAllColumns() {

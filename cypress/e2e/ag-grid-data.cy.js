@@ -10,10 +10,10 @@ import { filterOperator } from "../../src/agGrid/filterOperator.enum";
 const _pageSize = 5;
 const agGridSelector = "#myGrid";
 
-describe("ag-grid scenarios", () => {
+describe("ag-grid get data scenarios", () => {
   beforeEach(() => {
     cy.visit("../app/index.html");
-    cy.get(".ag-cell", {timeout: 10000}).should("be.visible");
+    cy.get(".ag-cell", { timeout: 10000 }).should("be.visible");
   });
 
   it("verify paginated table data - include all columns", () => {
@@ -98,37 +98,39 @@ describe("ag-grid scenarios", () => {
         columnName: "Model",
         filterValue: "2002",
       },
+      selectAllLocaleText: "Select All", // This is optional if you are using localText for ag grid
       hasApplyButton: true,
     });
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
       });
   });
 
   it("able to filter by checkbox - multiple columns", () => {
     const expectedTableData = [
-        { Year: "2020", Make: "BMW", Model: "3-series", Price: "45000" },
-        { Year: "2020", Make: "BMW", Model: "3-series", Price: "32000" },
-        { Year: "2020", Make: "BMW", Model: "2002", Price: "88001" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Price: "45000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Price: "32000" },
+      { Year: "2020", Make: "BMW", Model: "2002", Price: "88001" },
     ];
     cy.get(agGridSelector).agGridColumnFilterCheckboxMenu({
-      searchCriteria: [{
-        columnName: "Model",
-        filterValue: "2002",
-      },
-      {
-        columnName: "Model",
-        filterValue: "3-series",
-      }
-    ],
+      searchCriteria: [
+        {
+          columnName: "Model",
+          filterValue: "2002",
+        },
+        {
+          columnName: "Model",
+          filterValue: "3-series",
+        },
+      ],
       hasApplyButton: true,
     });
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData, true);
       });
   });
 
@@ -150,7 +152,7 @@ describe("ag-grid scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
       });
   });
 
@@ -160,23 +162,24 @@ describe("ag-grid scenarios", () => {
     ];
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
     cy.get(agGridSelector).agGridColumnFilterTextMenu({
-      searchCriteria: [{
-        columnName: "Price",
-        filterValue: "32000",
-        operator: filterOperator.equals,
-      },
-      {
-        columnName: "Make",
-        filterValue: "BMW",
-        operator: filterOperator.equals,
-      }
-    ],
+      searchCriteria: [
+        {
+          columnName: "Price",
+          filterValue: "32000",
+          operator: filterOperator.equals,
+        },
+        {
+          columnName: "Make",
+          filterValue: "BMW",
+          operator: filterOperator.equals,
+        },
+      ],
       hasApplyButton: true,
     });
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
       });
   });
 
@@ -198,7 +201,37 @@ describe("ag-grid scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+      });
+  });
+
+  it("able to filter by text - floating filter - multiple conditions", () => {
+    const expectedTableData = [
+      { Year: "2020", Make: "BMW", Model: "2002", Price: "88001" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Price: "45000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Price: "32000" },
+    ];
+    cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: {
+        columnName: "Make",
+        filterValue: "B",
+        searchInputIndex: 0,
+      },
+      hasApplyButton: true,
+    });
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: {
+        columnName: "Make",
+        filterValue: "MW",
+        searchInputIndex: 1,
+      },
+      hasApplyButton: true,
+    });
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
       });
   });
 
@@ -208,15 +241,16 @@ describe("ag-grid scenarios", () => {
     ];
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
     cy.get(agGridSelector).agGridColumnFilterTextFloating({
-      searchCriteria: [{
-        columnName: "Make",
-        filterValue: "Ford",
-      },
-      {
-        columnName: "Year",
-        filterValue: "1990",
-      }
-    ],
+      searchCriteria: [
+        {
+          columnName: "Make",
+          filterValue: "Ford",
+        },
+        {
+          columnName: "Year",
+          filterValue: "1990",
+        },
+      ],
       hasApplyButton: true,
     });
     cy.get(agGridSelector)
@@ -224,7 +258,31 @@ describe("ag-grid scenarios", () => {
       .then((actualTableData) => {
         cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
       });
-  });  
+  });
+
+  it("able to filter by text - floating filter - multi filter", () => {
+    const expectedTableData = [
+      { Year: "2020", Make: "Ford", Model: "Taurus", Price: "19000" },
+      { Year: "1990", Make: "Ford", Model: "Taurus", Price: "900" },
+    ];
+    cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: [
+        {
+          columnName: "Model",
+          filterValue: "Taurus",
+          isMultiFilter: true
+        },
+      ],
+      hasApplyButton: true,
+    });
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+      });
+  });
+
 
   it("able to validate empty table", () => {
     //Search for an entry that does not exist
@@ -239,7 +297,7 @@ describe("ag-grid scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateEmptyTable(actualTableData);
+        cy.agGridValidateEmptyTable(actualTableData);
       });
   });
 
@@ -258,7 +316,7 @@ describe("ag-grid scenarios", () => {
       cy.get(agGridSelector)
         .getAgGridData()
         .then((actualTableData) => {
-          cy.get(agGridSelector).agGridValidateRowsExactOrder(
+          cy.agGridValidateRowsExactOrder(
             actualTableData,
             expectedData_sortedByAscending
           );
@@ -281,7 +339,7 @@ describe("ag-grid scenarios", () => {
       cy.get(agGridSelector)
         .getAgGridData()
         .then((actualTableData) => {
-          cy.get(agGridSelector).agGridValidateRowsExactOrder(
+          cy.agGridValidateRowsExactOrder(
             actualTableData,
             expectedData_sortedByDescending
           );
@@ -299,7 +357,7 @@ describe("ag-grid scenarios", () => {
       cy.get(agGridSelector)
         .getAgGridData()
         .then((actualTableData) => {
-          cy.get(agGridSelector).agGridValidateRowsExactOrder(
+          cy.agGridValidateRowsExactOrder(
             actualTableData,
             expectedData_yearColumnRemoved.slice(0, _pageSize)
           );
@@ -318,7 +376,7 @@ describe("ag-grid scenarios", () => {
       cy.get(agGridSelector)
         .getAgGridData()
         .then((actualTableData) => {
-          cy.get(agGridSelector).agGridValidateRowsExactOrder(
+          cy.agGridValidateRowsExactOrder(
             actualTableData,
             expectedData_priceColumnRemoved.slice(0, _pageSize)
           );
@@ -337,7 +395,7 @@ describe("ag-grid scenarios", () => {
       cy.get(agGridSelector)
         .getAgGridData()
         .then((actualTableData) => {
-          cy.get(agGridSelector).agGridValidateRowsExactOrder(
+          cy.agGridValidateRowsExactOrder(
             actualTableData,
             expectedData_multipleColumnsRemoved.slice(0, _pageSize)
           );
@@ -356,7 +414,7 @@ describe("ag-grid scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData({ onlyColumns: ["Year", "Make", "Model"] })
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsSubset(actualTableData, expectedTableData);
+        cy.agGridValidateRowsSubset(actualTableData, expectedTableData);
       });
   });
 });

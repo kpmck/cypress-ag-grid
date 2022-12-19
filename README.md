@@ -5,12 +5,16 @@ Cypress plugin for interacting with and validating against ag grid.
   * [Installation](#installation)
   * [Usage](#usage)
     + [Grid Interaction](#)
-        - [Getting Data From the Grid](#getting-data-from-the-grid-)
+        - [Getting Data From the Grid](#getting-data-from-the-grid)
         - [Getting Select Row Data](#getting-select-row-data)
+        - [Getting Elements From the Grid](#getting-elements-from-the-grid)
         - [Sorting Columns](#sorting-columns)
+    + [Grid Filtering](#)
+        - [Filter Options](#filter-options)
         - [Filter by Text - Column Menu](#filter-by-text---column-menu)
         - [Filterby Text - Floating Filter](#filterby-text---floating-filter)
         - [Filter by Checkbox - Column Menu](#filter-by-checkbox---column-menu)
+        - [Filtering - Localization and Internationalization](#filtering---localization-and-internationalization)
         - [Add or Remove Columns](#add-or-remove-columns)
     + [Grid Validation](#)
         - [Validate Paginated Table](#validate-paginated-table)
@@ -70,7 +74,7 @@ The correct command will return the following:
 To only get certain rows of data, pass the header values into the `getAgGridData()` command, like so:
 
 ```javascript
-cy.get("#myGrid).getAgGridData({ onlyColumns: ["Year", "Make"] })
+cy.get("#myGrid").getAgGridData({ onlyColumns: ["Year", "Make"] })
 ```
 
 The above command will return the follwoing:
@@ -83,6 +87,25 @@ The above command will return the follwoing:
     { "Year": "2020", "Make": "Mercedes"},
 ]
 ```
+</br>
+</br>
+
+### Getting Elements From the Grid
+To get the Ag Grid data as elements (if you want to interact with the cells themselves), you must chain `.getAgGridElements()` after the `cy.get()` command for the topmost level of the grid, including controls and headers (see selected DOM element in above image).
+```javascript
+    cy.get(agGridSelector)
+      .getAgGridElements()
+      .then((tableElements) => {
+        const porscheRow = tableElements.find(
+          (row) => row.Price.innerText === "72000"
+        );
+        const priceCell = porscheRow.Price;
+        cy.wrap(priceCell).dblclick().type("66000{enter}");
+      });
+
+```
+
+The above example will grab the table as elements, finds the row whose `Price` equals `72000`. It then gets the `Price` cell for that row, double clicks on it to enable an editable input, and changes the value of the cell.
 </br>
 </br>
 
@@ -99,6 +122,36 @@ cy.get("#myGrid").agGridSortColumn("Model", "descending");
 ```
 </br>
 </br>
+
+### Filter Options
+
+The below filtering commands takes an `options` parameter comprised of the following properties:
+
+```javascript
+options: {
+    searchCriteria: [{
+        columnName: string;
+        filterValue: string;
+        operator?: string;
+        isMultiFilter?: boolean;
+    }];
+    hasApplyButton?: boolean;
+    noMenuTab?: boolean;
+    selectAllLocaleText: string;
+}
+
+/**
+- options.searchCriteria JSON with search properties and options
+- options.searchCriteria.columnName name of the column to filter
+- options.searchCriteria.filterValue value to input into the filter textbox
+- options.searchCriteria.searchInputIndex [Optional] Uses 0 by default. Index of which filter box to use in event of having multiple search conditionals
+- options.searchCriteria.operator [Optional] Use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values).
+- options.searchCriteria.isMultiFilter [Optional] Used when floating filter menu has checkbox options vs freeform text input.
+- options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
+- options.noMenuTabs [Optional] True if you use, for example, the community edition of ag-grid, which has no menu tabs
+- options.selectAllLocaleText [Optional] Pass in the locale text value of "Select All" for when you are filtering by checkbox - this will first deselect the "Select All" option before selecting your filter value
+*/
+```
 
 ### Filter by Text - Column Menu
 This command will filter a column by a text value from its menu. In the options, you must specify a `searchCriteria` objects containing one or more objects with `columnName`, `filterValue`, and optionally `operator` (i.e. Contains, Not contains, Equals, etc.).
@@ -128,13 +181,48 @@ The above command will filter the Model column for the value 'GLC300' and set th
 </br>
 </br>
 ### Filterby Text - Floating Filter
-This command will filter a column by a text value from its floating filter (if applicable).
+This command will filter a column by a text value from its floating filter (if applicable). This command will filter a column by a text value from its floating menu. In the options, you must specify a `searchCriteria` object with `columnName`, `filterValue`, and optionally `operator` (i.e. Contains, Not contains, Equals, etc.) and `searchInputIndex` in the event you wish to apply multiple text conditions (see below for multi-condition example).
 
 ![alt text](./ag-grid-example-filter-text-floating.png "AG Grid Dom - Filter by Text Floating")
 
-<b>Definition:</b> .agGridColumnFilterTextMenu(options: {})
+<b>Definition:</b> .agGridColumnFilterTextFloating(options: {})
 
-See [Filter by Text - Column Menu](#filter-by-Text---Column-Menu) for example and usage.
+Example:
+```
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: {
+        columnName: "Make",
+        filterValue: "Ford",
+      },
+      hasApplyButton: true,
+    });
+```
+
+The above example will search for the Make `Ford` from the floating text menu filter.
+
+If you have the option for multiple conditions on the floating filter, you can do two searches, specifying the `searchInputIndex` parameter in the `searchCriteria` object. The below example will ssarch for any `Make` that contains `B` AND `MW`:
+
+Example: 
+```
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: {
+        columnName: "Make",
+        filterValue: "B",
+        searchInputIndex: 0,
+      },
+      hasApplyButton: true,
+    });
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: {
+        columnName: "Make",
+        filterValue: "MW",
+        searchInputIndex: 1,
+      },
+      hasApplyButton: true,
+    });
+```
+![alt text](./ag-grid-example-filter-text-floating-multi-condition.png "AG Grid Dom - Filter by Text Floating")
+
 <br/>
 </br>
 
@@ -159,6 +247,20 @@ Example:
 
 ```
 </br>
+
+### Filtering - Localization and Internationalization
+When we filter by checkbox, we first deselect the Select All checkbox to ensure we ONLY select the specified checkbox. Since AG grid allows for localization, we need a way to be able to pass in the localeText for Select All. This is the only area of this plugin that has a hard-coded value, so no other localization accommodations are needed.
+
+```
+    cy.get("#myGrid").agGridColumnFilterCheckboxMenu({
+      searchCriteria: {
+        columnName: "Model",
+        filterValue: "2002",
+      },
+      selectAllLocaleText: "Tout Sélectionner"
+      hasApplyButton: true,
+    });
+```   
 </br>
 
 ### Add or Remove Columns
@@ -216,7 +318,7 @@ Example:
 cy.get("#myGrid")
 .getAgGridData()
 .then((actualTableData) => {
-    cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+    cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
 });
 ```
 <br/>
@@ -239,7 +341,7 @@ Example:
     cy.get(agGridSelector)
       .getAgGridData({ onlyColumns: ["Year", "Make", "Model"] })
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsSubset(actualTableData, expectedTableData);
+        cy.agGridValidateRowsSubset(actualTableData, expectedTableData);
       });
   });
 ```
@@ -256,19 +358,19 @@ Example:
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateEmptyTable(actualTableData);
+        cy.agGridValidateEmptyTable(actualTableData);
       });
 ```
 
 ## Limitations
-* Unable to validate deeply nested row groups
-* Unable to validate deeply nested column groups
+* ~~Unable to validate deeply nested row groups~~ As of v2.x, using `.getAgGridElements()` you should be able to accomplish this.
+* ~~Unable to validate deeply nested column groups~~ As of v2.x, using `.getAgGridElements()` you should be able to accomplish this.
 * Unable to validate the entirety of an unlimited scrolling grid.
 * Unable to validate data that is out of view. The DOM will register the ag grid data as it's scrolled into view.
   * To combat this, in your code where the ag grid is called, check if the Cypress window is controlling the app and set the ag grid object to `.sizeColumnsToFit()`. You can see an example of this in the `app/grid.js` file of this repository. Read more [here](https://www.ag-grid.com/javascript-grid/column-sizing/#size-columns-to-fit)
   * Example: 
   ```javascript
-  if(Cypress.window){
+  if(window.Cypress){
       this.api.sizeColumnsToFit();
   }
   ``` 

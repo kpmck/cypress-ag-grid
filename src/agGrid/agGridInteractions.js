@@ -5,13 +5,14 @@ import { filterTab } from "./menuTab.enum";
 /**
  * Uses the attribute value's index and sorts the data accordingly.
  * For our purposes, we are getting the attribute with the items' indices and sorting accordingly.
- * @param {*} index 
- * @returns 
+ *
+ * @param {*} index
+ * @returns
  */
-function sortElementsByAttributeIndex(index) {
+function sortElementsByAttributeValue(attribute) {
   return (a, b) => {
-    const contentA = parseInt(a.attributes[index].nodeValue, 10).valueOf();
-    const contentB = parseInt(b.attributes[index].nodeValue, 10).valueOf();
+    const contentA = parseInt(a.attributes[attribute].nodeValue, 10).valueOf();
+    const contentB = parseInt(b.attributes[attribute].nodeValue, 10).valueOf();
     return contentA < contentB ? -1 : contentA > contentB ? 1 : 0;
   };
 }
@@ -22,6 +23,19 @@ function sortElementsByAttributeIndex(index) {
  * @param options Provide an array of columns you wish to exclude from the table retrieval.
  */
 export const getAgGridData = (agGridElement, options = {}) => {
+  return _getAgGrid(agGridElement, options, false);
+};
+
+/**
+ * Retrieves the values from the *displayed* page in ag grid and assigns each value to its respective column name.
+ * @param agGridElement The get() selector for which ag grid table you wish to retrieve.
+ * @param options Provide an array of columns you wish to exclude from the table retrieval.
+ */
+export const getAgGridElements = (agGridElement, options = {}) => {
+  return _getAgGrid(agGridElement, options, true);
+};
+
+function _getAgGrid(agGridElement, options = {}, returnElements) {
   const agGridColumnSelectors =
     ".ag-pinned-left-cols-container^.ag-center-cols-clipper^.ag-pinned-right-cols-container";
   if (agGridElement.get().length > 1)
@@ -32,42 +46,73 @@ export const getAgGridData = (agGridElement, options = {}) => {
   const tableElement = agGridElement.get()[0].querySelectorAll(".ag-root")[0];
   const agGridSelectors = agGridColumnSelectors.split("^");
   const headers = [
-    ...tableElement.querySelectorAll(".ag-header-cell-text")
-  ].map((e) => e.textContent.trim());
+    ...tableElement.querySelectorAll(".ag-header-row-column [aria-colindex]"),
+  ]
+    .sort(sortElementsByAttributeValue("aria-colindex"))
+    .map((headerElement) => {
+      // Check if the elements returned are already .ag-header-cell-text elements
+      // If not, query for that element and return the text content
+      let headerCells = [
+        ...headerElement.querySelectorAll(".ag-header-cell-text"),
+      ];
+      if (headerCells.length === 0) {
+        return [headerElement].map((e) => e.textContent.trim());
+      } else {
+        return [...headerElement.querySelectorAll(".ag-header-cell-text")].map(
+          (e) => e.textContent.trim()
+        );
+      }
+    })
+    .flat();
+
   let allRows = [];
   let rows = [];
 
   agGridSelectors.forEach((selector) => {
-    const _rows = [...tableElement.querySelectorAll(`${selector}:not(.ag-hidden) .ag-row`)]
+    const _rows = [
+      ...tableElement.querySelectorAll(`${selector}:not(.ag-hidden) .ag-row`),
+    ]
       // Sort rows by their row-index attribute value
-      .sort(sortElementsByAttributeIndex(3))
+      .sort(sortElementsByAttributeValue("row-index"))
       .map((row) => {
         // Sort row cells by their aria-colindex attribute value
-        return [...row.querySelectorAll(".ag-cell")]
-          .sort(sortElementsByAttributeIndex(3))
-          .map((e) => e.textContent.trim());
+        // First check if elements returned already contain the aria-colindex
+        // If not, just query for the .ag-cell
+        let rowCells = [...row.querySelectorAll(".ag-cell [aria-colindex]")];
+        if (rowCells.length === 0) {
+          rowCells = [...row.querySelectorAll(".ag-cell")];
+        }
+        return rowCells
+          .sort(sortElementsByAttributeValue("aria-colindex"))
+          .map((e) => {
+            if (returnElements) {
+              return e;
+            } else {
+              return e.textContent.trim();
+            }
+          });
       });
     allRows.push(_rows);
   });
 
   // Remove any empty arrays before merging
-  allRows = allRows.filter(function(ele){
-    return ele.length
-  })
-
-  if(!allRows.length) rows = [];
-  else{
-  // Combine results from all specified tables (either single table, or all pinned columns) by index
-  rows = allRows.reduce(function(a, b) {
-    return a.map(function(v, i) {
-      return v.concat(b[i]);
-    });
+  allRows = allRows.filter(function (ele) {
+    return ele.length;
   });
-}
+
+  if (!allRows.length) rows = [];
+  else {
+    // Combine results from all specified tables (either single table, or all pinned columns) by index
+    rows = allRows.reduce(function (a, b) {
+      return a.map(function (v, i) {
+        return v.concat(b[i]);
+      });
+    });
+  }
 
   // if options.rawValues = true, return headers & rows values as arrays instead of mapping as objects
   if (options.valuesArray) {
-    return {headers, rows};
+    return { headers, rows };
   }
 
   // return structured object from headers and rows variables
@@ -84,7 +129,7 @@ export const getAgGridData = (agGridElement, options = {}) => {
       return { ...acc, [headers[idx]]: curr };
     }, {})
   );
-};
+}
 
 /**
  * Retrieve the ag grid column header element based on its column name value
@@ -170,7 +215,7 @@ function getFilterColumnButtonElement(
           .then(() => {
             cy.wrap($ele)
               .parents(".ag-header-row-column")
-              .siblings(".ag-header-row-floating-filter")
+              .siblings(".ag-header-row-column-filter")
               .find(`.ag-header-cell[aria-colindex=${columnIndex}]`)
               .find(".ag-floating-filter-button");
           });
@@ -187,9 +232,15 @@ function getFilterColumnButtonElement(
  * @param operator (optional) use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values)
  * @param noMenuTabs (optional) boolean indicating if the menu has tabs.
  */
-function filterBySearchTerm(agGridElement, filterValue, operator, noMenuTabs) {
+ function filterBySearchTerm(agGridElement, options) {
+  const filterValue = options.searchCriteria.filterValue;
+  const operator = options.searchCriteria.operator;
+  const searchInputIndex = options.searchCriteria.searchInputIndex || 0;
+  const isMultiFilter = options.searchCriteria.isMultiFilter;
+  const noMenuTabs = options.noMenuTabs;
+  
   // Navigate to the filter tab
-  if (!noMenuTabs) { 
+  if (!noMenuTabs) {
     selectMenuTab(agGridElement, filterTab.filter);
   }
   if (operator) {
@@ -203,7 +254,7 @@ function filterBySearchTerm(agGridElement, filterValue, operator, noMenuTabs) {
       .contains(operator)
       .then(($ele) => {
         //Have to use the unwrapped element, since Cypress .click() event does not appropriately select the operator
-        $ele.trigger('click');
+        $ele.trigger("click");
       });
   }
   // Input filter term and allow grid a moment to render the results
@@ -211,8 +262,32 @@ function filterBySearchTerm(agGridElement, filterValue, operator, noMenuTabs) {
     .find(".ag-popup-child")
     .find("input")
     .filter(":visible")
-    .type(filterValue)
-    .wait(500);
+    .as("filterInput")
+
+    // If it's a multi filter, de-select the 'select-all' checkbox
+    if(isMultiFilter){
+      const selectAllText = options.selectAllLocaleText || "Select All";
+      toggleColumnCheckboxFilter(
+        agGridElement,
+        selectAllText,
+        false,
+        true
+      );
+    }
+
+    // Get the saved filter input and enter the search term
+    cy.get("@filterInput").then(($ele)=>{
+      cy.wrap($ele)
+      .eq(searchInputIndex)
+      .clear()
+      .type(filterValue)
+      .wait(500);  
+    })
+
+    // Finally, if a multi-filter, select the filter value's checkbox
+    if(isMultiFilter){
+      toggleColumnCheckboxFilter(agGridElement, filterValue, true, true)
+    }
 }
 
 function applyColumnFilter(agGridElement, hasApplyButton, noMenuTabs) {
@@ -221,11 +296,9 @@ function applyColumnFilter(agGridElement, hasApplyButton, noMenuTabs) {
       .find(".ag-filter-apply-panel-button")
       .contains("Apply")
       .click();
-
   }
-  if (!noMenuTabs)
-  {
-     getMenuTabElement(agGridElement, filterTab.filter).click();
+  if (!noMenuTabs) {
+    getMenuTabElement(agGridElement, filterTab.filter).click();
   }
 }
 
@@ -241,9 +314,8 @@ function toggleColumnCheckboxFilter(
   doSelect,
   noMenuTabs = false
 ) {
-  if (!noMenuTabs)
-  {
-     selectMenuTab(agGridElement, filterTab.filter);
+  if (!noMenuTabs) {
+    selectMenuTab(agGridElement, filterTab.filter);
   }
   cy.get(agGridElement)
     .find(".ag-input-field-label")
@@ -256,7 +328,12 @@ function toggleColumnCheckboxFilter(
     });
 }
 
-function populateSearchCriteria(searchCriteria, hasApplyButton = false, noMenuTabs = false) {
+function populateSearchCriteria(
+  searchCriteria,
+  hasApplyButton = false,
+  noMenuTabs = false,
+  selectAllLocaleText = 'Select All'
+  ) {
   const options = {};
   //@ts-ignore
   options.searchCriteria = {};
@@ -264,6 +341,10 @@ function populateSearchCriteria(searchCriteria, hasApplyButton = false, noMenuTa
   options.searchCriteria.columnName = searchCriteria.columnName;
   //@ts-ignore
   options.searchCriteria.filterValue = searchCriteria.filterValue;
+  //@ts-ignore
+  options.searchCriteria.isMultiFilter = searchCriteria.isMultiFilter;
+  //@ts-ignore
+  options.selectAllLocaleText = selectAllLocaleText;
   //@ts-ignore
   options.hasApplyButton = hasApplyButton;
   //@ts-ignore
@@ -289,7 +370,8 @@ export function filterBySearchTextColumnMenu(agGridElement, options) {
       const _options = populateSearchCriteria(
         _searchCriteria,
         options.hasApplyButton,
-        options.noMenuTabs
+        options.noMenuTabs,
+        options.isMultiFilter
       );
       _filterBySearchTextColumnMenu(agGridElement, _options);
     });
@@ -306,9 +388,7 @@ function _filterBySearchTextColumnMenu(agGridElement, options) {
   ).click();
   filterBySearchTerm(
     agGridElement,
-    options.searchCriteria.filterValue,
-    options.searchCriteria.operator,
-    options.noMenuTabs
+    options
   );
   applyColumnFilter(agGridElement, options.hasApplyButton, options.noMenuTabs);
 }
@@ -316,14 +396,16 @@ function _filterBySearchTextColumnMenu(agGridElement, options) {
 /**
  *  * Performs a filter operation on the specified column via the column's floating filter field using plain text search
  * @param agGridElement The get() selector for which ag grid table you wish to retrieve.
- * @param {{searchCriteria:[{columnName:string,filterValue:string,operator?:string}], hasApplyButton?:boolean}} options JSON with search properties
+ * @param {{searchCriteria:[{columnName:string,filterValue:string,operator?:string}], hasApplyButton?:boolean, noMenuTab?:boolean, selectAllLocaleText:string}} options JSON with search properties
  * @param options.searchCriteria JSON with search properties and options
  * @param options.searchCriteria.columnName name of the column to filter
  * @param options.searchCriteria.filterValue value to input into the filter textbox
+ * @param options.searchCriteria.searchInputIndex [Optional] Uses 0 by default. Index of which filter box to use in event of having multiple search conditionals
  * @param options.searchCriteria.operator [Optional] Use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values).
  * @param options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
- * @param options.noMenuTabs [Optional] True if you use for example the community edition of ag-grid, which has no menu tabs
-*/
+ * @param options.noMenuTabs [Optional] True if you use, for example, the community edition of ag-grid, which has no menu tabs
+ * @param options.selectAllLocaleText [Optional] Pass in the locale text value of "Select All" for when you are filtering by checkbox - this wil first deselect the "Select All" option before selecting your filter value
+ */
 export function filterBySearchTextColumnFloatingFilter(agGridElement, options) {
   // Check if there are multiple search criteria provided by attempting to access the columnName
   if (!options.searchCriteria.columnName) {
@@ -349,11 +431,13 @@ function _filterBySearchTextColumnFloatingFilter(agGridElement, options) {
     ).click();
     filterBySearchTerm(
       agGridElement,
-      options.searchCriteria.filterValue,
-      options.searchCriteria.operator,
+      options
+    );
+    applyColumnFilter(
+      agGridElement,
+      options.hasApplyButton,
       options.noMenuTabs
     );
-    applyColumnFilter(agGridElement, options.hasApplyButton, options.noMenuTabs);
   });
 }
 
@@ -389,9 +473,10 @@ function _filterByCheckboxColumnMenu(agGridElement, options) {
       agGridElement,
       options.searchCriteria.columnName
     ).click();
+    const selectAllText = options.selectAllLocaleText || "Select All";
     toggleColumnCheckboxFilter(
       agGridElement,
-      "Select All",
+      selectAllText,
       false,
       options.noMenuTabs
     );
@@ -401,7 +486,11 @@ function _filterByCheckboxColumnMenu(agGridElement, options) {
       true,
       options.noMenuTabs
     );
-    applyColumnFilter(agGridElement, options.hasApplyButton, options.noMenuTabs);
+    applyColumnFilter(
+      agGridElement,
+      options.hasApplyButton,
+      options.noMenuTabs
+    );
   });
 }
 
@@ -409,7 +498,11 @@ function _filterByCheckboxColumnMenu(agGridElement, options) {
  * Will perform a filter for all search criteria provided, then selects all found entries in the grid
  * @param searchCriteria a "\^" delimited string of all columns and searchCriteria to search for in the grid (i.e. "Name=John Smith^Rate Plan=Standard"
  */
-export function filterGridEntriesBySearchText(agGridElement, searchCriteria, isFloatingFilter = false) {
+export function filterGridEntriesBySearchText(
+  agGridElement,
+  searchCriteria,
+  isFloatingFilter = false
+) {
   if (isFloatingFilter) {
     filterBySearchTextColumnFloatingFilter(agGridElement, searchCriteria);
   } else {
