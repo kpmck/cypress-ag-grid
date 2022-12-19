@@ -25,6 +25,7 @@ export function validateTableRowSubset(agGridElement, actualTableData,expectedTa
 export function validateTablePages(agGridElement,expectedPaginatedTableData, onlyColumns = {}) {
     let iterator = 0;
     expectedPaginatedTableData.forEach((expectedPage) => {
+        cy.get('.ag-cell').should('be.visible');
         cy.get(agGridElement)
             .getAgGridData(onlyColumns)
             .then((table) => {

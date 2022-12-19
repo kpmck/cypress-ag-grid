@@ -458,7 +458,8 @@ export function filterByCheckboxColumnMenu(agGridElement, options) {
       const _options = populateSearchCriteria(
         _searchCriteria,
         options.hasApplyButton,
-        options.noMenuTabs
+        options.noMenuTabs,
+        options.selectAllLocaleText
       );
       _filterByCheckboxColumnMenu(agGridElement, _options);
     });
