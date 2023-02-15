@@ -31,7 +31,7 @@ Cypress plugin for interacting with and validating against ag grid.
 ```bash
 npm install cypress-ag-grid --save-dev
 ```
-Then include the following in your support/index.js file:
+Then include the following in your support/index.js file (Cypress v9 and below) or support/e2e.(js|ts) file (Cypress 10 and abovec):
 
 ```javascript
 import "cypress-ag-grid";
