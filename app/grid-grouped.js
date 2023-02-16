@@ -48,10 +48,10 @@ new agGrid.Grid(eGridDivGrouped, gridOptionsGrouped);
 // Grab the grid data from the supplied API endpoint
 agGrid
   .simpleHttpRequest({
-    url: "https://api.jsonbin.io/v3/b/608304f69a9aa933335613a6/2",
+    url: "./data.json",
   })
   .then((data) => {
-    gridOptionsGrouped.api.setRowData(data.record);
+    gridOptionsGrouped.api.setRowData(data);
   });
 
 function autoSizeAllColumns() {

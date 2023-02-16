@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 import { sort } from "./sort.enum";
 import { filterTab } from "./menuTab.enum";
+import { filterOperator } from "./filterOperator.enum";
 
 /**
  * Uses the attribute value's index and sorts the data accordingly.
@@ -243,6 +244,7 @@ function getFilterColumnButtonElement(
   if (!noMenuTabs) {
     selectMenuTab(agGridElement, filterTab.filter);
   }
+
   if (operator) {
     cy.get(agGridElement)
       .find(".ag-picker-field-wrapper")
@@ -276,13 +278,15 @@ function getFilterColumnButtonElement(
     }
 
     // Get the saved filter input and enter the search term
-    cy.get("@filterInput").then(($ele)=>{
-      cy.wrap($ele)
-      .eq(searchInputIndex)
-      .clear()
-      .type(filterValue)
-      .wait(500);  
-    })
+    if(operator !== filterOperator.blank && operator !== filterOperator.notBlank){      
+      cy.get("@filterInput").then(($ele)=>{
+        cy.wrap($ele)
+        .eq(searchInputIndex)
+        .clear()
+        .type(filterValue)
+        .wait(500);  
+      })
+    }
 
     // Finally, if a multi-filter, select the filter value's checkbox
     if(isMultiFilter){
