@@ -9,5 +9,7 @@ export const filterOperator = {
   lessThanOrEquals: "Less than or equals",
   greaterThan: "Greater than",
   greaterThanOrEquals: "Greater than or equals",
-  inRange: "In range"
+  inRange: "In range",
+  blank: "Blank",
+  notBlank: "Not Blank"
 }

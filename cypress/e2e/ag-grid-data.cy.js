@@ -44,6 +44,7 @@ describe("ag-grid get data scenarios", () => {
         { Year: "1990", Make: "Ford", Model: "Taurus", Price: "900" },
         { Year: "2020", Make: "Hyundai", Model: "Elantra", Price: "3000" },
         { Year: "2020", Make: "BMW", Model: "2002", Price: "88001" },
+        { Year: "2023", Make: "Hyundai", Model: "Santa Fe", Price: "" },
       ],
     ];
     cy.get(agGridSelector).agGridValidatePaginatedTable(
@@ -79,6 +80,7 @@ describe("ag-grid get data scenarios", () => {
         { Year: "1990", Make: "Ford", Model: "Taurus" },
         { Year: "2020", Make: "Hyundai", Model: "Elantra" },
         { Year: "2020", Make: "BMW", Model: "2002" },
+        { Year: "2023", Make: "Hyundai", Model: "Santa Fe"},
       ],
     ];
     cy.get(agGridSelector).agGridValidatePaginatedTable(
@@ -130,7 +132,11 @@ describe("ag-grid get data scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData, true);
+        cy.agGridValidateRowsExactOrder(
+          actualTableData,
+          expectedTableData,
+          true
+        );
       });
   });
 
@@ -256,7 +262,10 @@ describe("ag-grid get data scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+        cy.get(agGridSelector).agGridValidateRowsExactOrder(
+          actualTableData,
+          expectedTableData
+        );
       });
   });
 
@@ -271,7 +280,7 @@ describe("ag-grid get data scenarios", () => {
         {
           columnName: "Model",
           filterValue: "Taurus",
-          isMultiFilter: true
+          isMultiFilter: true,
         },
       ],
       hasApplyButton: true,
@@ -279,10 +288,12 @@ describe("ag-grid get data scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.get(agGridSelector).agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+        cy.get(agGridSelector).agGridValidateRowsExactOrder(
+          actualTableData,
+          expectedTableData
+        );
       });
   });
-
 
   it("able to validate empty table", () => {
     //Search for an entry that does not exist
@@ -417,6 +428,26 @@ describe("ag-grid get data scenarios", () => {
         cy.agGridValidateRowsSubset(actualTableData, expectedTableData);
       });
   });
+
+  it("able to filter by 'Blank'", () =>{
+    const expectedTableData = [
+      { Year: "2023", Make: "Hyundai", Model: "Santa Fe", Price: "" }
+    ]
+
+    cy.get(agGridSelector).agGridColumnFilterTextMenu({
+      searchCriteria: {
+        columnName: "Price",
+        operator: filterOperator.blank,
+      },
+      hasApplyButton: true,
+    });
+    cy.get(agGridSelector)
+    .getAgGridData()
+    .then((actualTableData) => {
+      cy.agGridValidateRowsSubset(actualTableData, expectedTableData);
+    });  
+
+  })
 });
 
 function removePropertyFromCollection(expectedTableData, columnsToExclude) {
