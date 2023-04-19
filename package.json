@@ -1,11 +1,11 @@
 {
-  "name": "cypress-ag-grid",
-  "version": "2.0.2",
-  "description": "Cypress plugin to interact with ag grid",
+  "name": "cypress-ag-grid-group-headers",
+  "version": "1.0.2",
+  "description": "Fork of cypress-ag-grid that allows using group headers",
   "main": "src/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kpmck/cypress-ag-grid.git"
+    "url": "git+https://github.com/OVO-Josh/cypress-ag-grid-group-headers.git"
   },
   "keywords": [
     "aggrid",
@@ -21,7 +21,7 @@
     "test": "npx cypress run --headless --spec cypress/integration/ag-grid-spec.js",
     "test:watch": "npx cypress open"
   },
-  "author": "Kerry McKeever <kerry@kerrymckeever.com>",
+  "author": "Joshua Bosman <josh.bosman@ovo.com>",
   "license": "MIT",
   "devDependencies": {
     "cypress": "^10.1.0"
