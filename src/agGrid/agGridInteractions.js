@@ -79,37 +79,36 @@ function _getAgGrid(agGridElement, options = {}, returnElements) {
         // Sort row cells by their aria-colindex attribute value
         // First check if elements returned already contain the aria-colindex
         // If not, just query for the .ag-cell
-        let rowCells = [...row.querySelectorAll(".ag-cell [aria-colindex]")];
+        let rowCells = [...row.querySelectorAll(".ag-cell[aria-colindex]")];
         if (rowCells.length === 0) {
           rowCells = [...row.querySelectorAll(".ag-cell")];
         }
-        return rowCells
-          .sort(sortElementsByAttributeValue("aria-colindex"))
-          .map((e) => {
-            if (returnElements) {
-              return e;
-            } else {
-              return e.textContent.trim();
-            }
-          });
+        const rowIndex = parseInt(row.attributes["row-index"].nodeValue, 10).valueOf();
+
+        if (allRows[rowIndex]) {
+          allRows[rowIndex] = [
+            ...allRows[rowIndex],
+            ...rowCells
+          ];
+        } else {
+          allRows[rowIndex] = rowCells;
+        }
       });
-    allRows.push(_rows);
   });
 
-  // Remove any empty arrays before merging
-  allRows = allRows.filter(function (ele) {
-    return ele.length;
-  });
-
-  if (!allRows.length) rows = [];
-  else {
-    // Combine results from all specified tables (either single table, or all pinned columns) by index
-    rows = allRows.reduce(function (a, b) {
-      return a.map(function (v, i) {
-        return v.concat(b[i]);
-      });
-    });
-  }
+  rows = allRows
+  .filter(rowCells => rowCells.length)
+  .map(rowCells =>
+    rowCells
+      .sort(sortElementsByAttributeValue("aria-colindex"))
+      .map((e) => {
+        if (returnElements) {
+          return e;
+        } else {
+          return e.textContent.trim();
+        }
+      })
+  );
 
   // if options.rawValues = true, return headers & rows values as arrays instead of mapping as objects
   if (options.valuesArray) {
@@ -239,7 +238,7 @@ function getFilterColumnButtonElement(
   const searchInputIndex = options.searchCriteria.searchInputIndex || 0;
   const isMultiFilter = options.searchCriteria.isMultiFilter;
   const noMenuTabs = options.noMenuTabs;
-  
+
   // Navigate to the filter tab
   if (!noMenuTabs) {
     selectMenuTab(agGridElement, filterTab.filter);
@@ -278,13 +277,13 @@ function getFilterColumnButtonElement(
     }
 
     // Get the saved filter input and enter the search term
-    if(operator !== filterOperator.blank && operator !== filterOperator.notBlank){      
+    if(operator !== filterOperator.blank && operator !== filterOperator.notBlank){
       cy.get("@filterInput").then(($ele)=>{
         cy.wrap($ele)
         .eq(searchInputIndex)
         .clear()
         .type(filterValue)
-        .wait(500);  
+        .wait(500);
       })
     }
 
@@ -354,6 +353,38 @@ function populateSearchCriteria(
   //@ts-ignore
   options.noMenuTabs = noMenuTabs;
   return options;
+}
+
+/**
+ * Will add or remove a column from ag grid.
+ * @param columnName The column name to add/remove
+ * @param pin 'left', 'right' or null
+ */
+export function pinColumn(agGridElement, columnName, pin) {
+  getColumnHeaderElement(agGridElement, columnName)
+    .parent()
+    .siblings(".ag-header-cell-menu-button")
+    .click();
+
+  selectMenuTab(agGridElement, filterTab.general);
+
+  cy.get(agGridElement)
+      .find(".ag-menu-option")
+      .contains("Pin Column")
+      .click();
+
+  var selectedOption;
+
+  switch(pin) {
+    case 'left': selectedOption = 'Pin Left'; break;
+    case 'right': selectedOption = 'Pin Right'; break;
+    default: selectedOption = 'No Pin'; break;
+  }
+
+  cy.get(agGridElement)
+      .find(".ag-menu-option")
+      .contains(selectedOption)
+      .click();
 }
 
 /**

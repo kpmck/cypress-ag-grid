@@ -9,6 +9,36 @@ import { filterOperator } from "../../src/agGrid/filterOperator.enum";
 
 const _pageSize = 5;
 const agGridSelector = "#myGrid";
+const allData = [
+  [
+    { Year: "2020", Make: "Toyota", Model: "Celica", Price: "35000" },
+    { Year: "2020", Make: "Ford", Model: "Mondeo", Price: "32000" },
+    { Year: "2020", Make: "Porsche", Model: "Boxter", Price: "72000" },
+    { Year: "2020", Make: "BMW", Model: "3-series", Price: "45000" },
+    { Year: "2020", Make: "Mercedes", Model: "GLC300", Price: "53000" },
+  ],
+  [
+    { Year: "2020", Make: "Honda", Model: "Civic", Price: "22000" },
+    { Year: "2020", Make: "Honda", Model: "Accord", Price: "32000" },
+    { Year: "2020", Make: "Ford", Model: "Taurus", Price: "19000" },
+    { Year: "2020", Make: "Hyundai", Model: "Elantra", Price: "22000" },
+    { Year: "2020", Make: "Toyota", Model: "Celica", Price: "5000" },
+  ],
+  [
+    { Year: "2020", Make: "Ford", Model: "Mondeo", Price: "25000" },
+    { Year: "2020", Make: "Porsche", Model: "Boxter", Price: "99000" },
+    { Year: "2020", Make: "BMW", Model: "3-series", Price: "32000" },
+    { Year: "2020", Make: "Mercedes", Model: "GLC300", Price: "35000" },
+    { Year: "2011", Make: "Honda", Model: "Civic", Price: "9000" },
+  ],
+  [
+    { Year: "2020", Make: "Honda", Model: "Accord", Price: "34000" },
+    { Year: "1990", Make: "Ford", Model: "Taurus", Price: "900" },
+    { Year: "2020", Make: "Hyundai", Model: "Elantra", Price: "3000" },
+    { Year: "2020", Make: "BMW", Model: "2002", Price: "88001" },
+    { Year: "2023", Make: "Hyundai", Model: "Santa Fe", Price: "" },
+  ],
+];
 
 describe("ag-grid get data scenarios", () => {
   beforeEach(() => {
@@ -17,39 +47,27 @@ describe("ag-grid get data scenarios", () => {
   });
 
   it("verify paginated table data - include all columns", () => {
-    const expectedPaginatedTableData = [
-      [
-        { Year: "2020", Make: "Toyota", Model: "Celica", Price: "35000" },
-        { Year: "2020", Make: "Ford", Model: "Mondeo", Price: "32000" },
-        { Year: "2020", Make: "Porsche", Model: "Boxter", Price: "72000" },
-        { Year: "2020", Make: "BMW", Model: "3-series", Price: "45000" },
-        { Year: "2020", Make: "Mercedes", Model: "GLC300", Price: "53000" },
-      ],
-      [
-        { Year: "2020", Make: "Honda", Model: "Civic", Price: "22000" },
-        { Year: "2020", Make: "Honda", Model: "Accord", Price: "32000" },
-        { Year: "2020", Make: "Ford", Model: "Taurus", Price: "19000" },
-        { Year: "2020", Make: "Hyundai", Model: "Elantra", Price: "22000" },
-        { Year: "2020", Make: "Toyota", Model: "Celica", Price: "5000" },
-      ],
-      [
-        { Year: "2020", Make: "Ford", Model: "Mondeo", Price: "25000" },
-        { Year: "2020", Make: "Porsche", Model: "Boxter", Price: "99000" },
-        { Year: "2020", Make: "BMW", Model: "3-series", Price: "32000" },
-        { Year: "2020", Make: "Mercedes", Model: "GLC300", Price: "35000" },
-        { Year: "2011", Make: "Honda", Model: "Civic", Price: "9000" },
-      ],
-      [
-        { Year: "2020", Make: "Honda", Model: "Accord", Price: "34000" },
-        { Year: "1990", Make: "Ford", Model: "Taurus", Price: "900" },
-        { Year: "2020", Make: "Hyundai", Model: "Elantra", Price: "3000" },
-        { Year: "2020", Make: "BMW", Model: "2002", Price: "88001" },
-        { Year: "2023", Make: "Hyundai", Model: "Santa Fe", Price: "" },
-      ],
-    ];
     cy.get(agGridSelector).agGridValidatePaginatedTable(
-      expectedPaginatedTableData
+      allData
     );
+  });
+
+  it("verify exact order table data - include all columns", () => {
+    cy.get(agGridSelector)
+    .getAgGridData()
+    .then((actualTableData) => {
+        cy.agGridValidateRowsExactOrder(actualTableData, allData[0]);
+    });
+  });
+
+  it("verify exact order table data when columns are not in order - include all columns", () => {
+    cy.get(agGridSelector).agGridPinColumn('Price', 'left');
+
+    cy.get(agGridSelector)
+    .getAgGridData()
+    .then((actualTableData) => {
+        cy.agGridValidateRowsExactOrder(actualTableData, allData[0]);
+    });
   });
 
   it("verify paginated table data - excluding columns", () => {
@@ -445,7 +463,7 @@ describe("ag-grid get data scenarios", () => {
     .getAgGridData()
     .then((actualTableData) => {
       cy.agGridValidateRowsSubset(actualTableData, expectedTableData);
-    });  
+    });
 
   })
 });
