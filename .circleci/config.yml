@@ -9,7 +9,8 @@ workflows:
       - cypress/run:
           filters:
             branches:
+              ignore:
+                - main # Optional: ignore PRs from main branch
             pull_requests:
               branches:
-                - '*' # Run on all branches 
-                
+                - '*' # Run on all branches (you can restrict this if needed)
