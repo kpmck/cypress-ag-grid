@@ -24,6 +24,6 @@
   "author": "Kerry McKeever <kerry@kerrymckeever.com>",
   "license": "MIT",
   "devDependencies": {
-    "cypress": "^10.1.0"
+    "cypress": "^13.3.0"
   }
 }
