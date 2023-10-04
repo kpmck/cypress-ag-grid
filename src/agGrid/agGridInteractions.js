@@ -151,20 +151,26 @@ function getColumnHeaderElement(agGridElement, columnName) {
  * @returns
  */
 export function sortColumnBy(agGridElement, columnName, sortDirection) {
+    if(sortDirection.toLowerCase() === "ascending"){
+      sortDirection = "asc"
+    }else if(sortDirection.toLowerCase() === "descending"){
+      sortDirection = "desc"
+    }
+
   if (sortDirection === sort.ascending || sortDirection === sort.descending) {
     return getColumnHeaderElement(agGridElement, columnName)
-      .parents(".ag-header-cell")
-      .invoke("attr", "aria-sort")
+      .parents(".ag-header-cell .ag-cell-label-container")
+      .invoke("attr", "class")
       .then((value) => {
         cy.log(`sort: ${sortDirection}`);
-        if (value !== sortDirection) {
+        if(!value.includes(`ag-header-cell-sorted-${sortDirection}`)){
           getColumnHeaderElement(agGridElement, columnName).click().wait(250);
           sortColumnBy(agGridElement, columnName, sortDirection);
         }
       });
   } else {
     throw new Error(
-      "sortDirection must be either 'ascending' or 'descending'."
+      "sortDirection must be either 'asc' or 'desc'."
     );
   }
 }
