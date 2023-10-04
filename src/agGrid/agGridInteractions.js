@@ -249,6 +249,7 @@ function getFilterColumnButtonElement(
     cy.get(agGridElement)
       .find(".ag-picker-field-wrapper")
       .filter(":visible")
+      .eq(searchInputIndex)
       .click();
     cy.get(agGridElement)
       .find(".ag-popup")

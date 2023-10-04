@@ -1,9 +1,17 @@
 // specify the columns
 const columnDefs = [
-  { field: "year", pinned: "left"},
+  { field: "year", pinned: "left" },
   { field: "make", rowGroup: false, pinned: "left" },
   { field: "model", filter: true },
-  { field: "price", pinned: "right", floatingFilter: false, sortable: false, editable: true, cellEditor: 'agTextCellEditor'  },
+  { field: "condition",filter: "agTextColumnFilter", filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: 'OR', } },
+  {
+    field: "price",
+    pinned: "right",
+    floatingFilter: false,
+    sortable: false,
+    editable: true,
+    cellEditor: "agTextCellEditor",
+  },
 ];
 
 const autoGroupColumnDef = {
@@ -65,6 +73,6 @@ function autoSizeAllColumns() {
 if (window.Cypress) {
   gridOptions.api.sizeColumnsToFit();
 } else {
-    // Otherwise auto-size columns the way we wish to view the grid in production.
-    autoSizeAllColumns();
+  // Otherwise auto-size columns the way we wish to view the grid in production.
+  autoSizeAllColumns();
 }
