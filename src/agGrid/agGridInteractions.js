@@ -340,19 +340,9 @@ function populateSearchCriteria(
   selectAllLocaleText = 'Select All'
   ) {
   const options = {};
-  //@ts-ignore
-  options.searchCriteria = {};
-  //@ts-ignore
-  options.searchCriteria.columnName = searchCriteria.columnName;
-  //@ts-ignore
-  options.searchCriteria.filterValue = searchCriteria.filterValue;
-  //@ts-ignore
-  options.searchCriteria.isMultiFilter = searchCriteria.isMultiFilter;
-  //@ts-ignore
+  options.searchCriteria = {...searchCriteria};
   options.selectAllLocaleText = selectAllLocaleText;
-  //@ts-ignore
   options.hasApplyButton = hasApplyButton;
-  //@ts-ignore
   options.noMenuTabs = noMenuTabs;
   return options;
 }
