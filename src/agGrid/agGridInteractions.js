@@ -38,7 +38,7 @@ export const getAgGridElements = (agGridElement, options = {}) => {
 
 function _getAgGrid(agGridElement, options = {}, returnElements) {
   const agGridColumnSelectors =
-    ".ag-pinned-left-cols-container^.ag-center-cols-clipper^.ag-pinned-right-cols-container";
+    ".ag-pinned-left-cols-container^.ag-center-cols-clipper^.ag-center-cols-viewport^.ag-pinned-right-cols-container";
   if (agGridElement.get().length > 1)
     throw new Error(
       `Selector "${agGridElement.selector}" returned more than 1 element.`
