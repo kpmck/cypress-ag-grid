@@ -1,5 +1,5 @@
 export const sort = {
-  ascending: "ascending",
-  descending: "descending",
+  ascending: "asc",
+  descending: "desc",
   none: "none"
 }
