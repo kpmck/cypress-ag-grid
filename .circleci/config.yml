@@ -3,4 +3,5 @@ orbs:
   cypress: cypress-io/cypress@3.1.1
 workflows:
     jobs:
-      - cypress/run
+      - cypress/run:
+          cypress-command: 'npx cypress run
