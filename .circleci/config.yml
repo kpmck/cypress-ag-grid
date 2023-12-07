@@ -1,13 +1,6 @@
 version: 2.1
-
 orbs:
-  cypress: cypress-io/cypress@3
-
+  cypress: cypress-io/cypress@3.1.1
 workflows:
-  run_cypress_tests:
     jobs:
       - cypress/run
-    filters:
-      branches:
-        only:
-          - /.*/ # This will match all branches
