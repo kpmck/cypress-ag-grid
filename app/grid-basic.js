@@ -53,20 +53,18 @@ const eGridDiv = document.querySelector("#myGrid");
 new agGrid.Grid(eGridDiv, gridOptions);
 
 // Grab the grid data from the supplied API endpoint
-agGrid
-  .simpleHttpRequest({
-    url: "./data.json",
-  })
+fetch("./data.json")
+  .then(res => res.json())
   .then((data) => {
-    gridOptions.api.setRowData(data);
+    gridOptions.api.setGridOption('rowData', data);
   });
 
 function autoSizeAllColumns() {
   var allColumnIds = [];
-  gridOptions.columnApi.getAllColumns().forEach(function (column) {
+  gridOptions.api.getAllColumns().forEach(function (column) {
     allColumnIds.push(column.colId);
   });
-  gridOptions.columnApi.autoSizeColumns(allColumnIds);
+  gridOptions.api.autoSizeColumns(allColumnIds);
 }
 
 // If the Cypress test is running, ensure all columns fit within the window
