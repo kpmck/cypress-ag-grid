@@ -18,7 +18,7 @@
     "cypress aggrid"
   ],
   "scripts": {
-    "test": "npx cypress run --headless --spec cypress/integration/ag-grid-spec.js",
+    "test": "npx cypress run --headless",
     "test:watch": "npx cypress open"
   },
   "author": "Kerry McKeever <kerry@kerrymckeever.com>",
