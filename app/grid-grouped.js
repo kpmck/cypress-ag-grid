@@ -46,18 +46,20 @@ const eGridDivGrouped = document.querySelector("#myGrid2");
 new agGrid.Grid(eGridDivGrouped, gridOptionsGrouped);
 
 // Grab the grid data from the supplied API endpoint
-fetch("./data.json")
-  .then(res => res.json())
+agGrid
+  .simpleHttpRequest({
+    url: "./data.json",
+  })
   .then((data) => {
-    gridOptionsGrouped.api.setGridOption('rowData', data);
+    gridOptionsGrouped.api.setRowData(data);
   });
 
 function autoSizeAllColumns() {
   var allColumnIds = [];
-  gridOptionsGrouped.api.getAllColumns().forEach(function (column) {
+  gridOptionsGrouped.columnApi.getAllColumns().forEach(function (column) {
     allColumnIds.push(column.colId);
   });
-  gridOptionsGrouped.api.autoSizeColumns(allColumnIds);
+  gridOptionsGrouped.columnApi.autoSizeColumns(allColumnIds);
 }
 
 // If the Cypress test is running, ensure all columns fit within the window

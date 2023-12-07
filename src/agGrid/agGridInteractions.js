@@ -167,7 +167,7 @@ export function sortColumnBy(agGridElement, columnName, sortDirection) {
           getColumnHeaderElement(agGridElement, columnName).click().wait(250);
           sortColumnBy(agGridElement, columnName, sortDirection);
         }
-      }).wait(100);
+      });
   } else {
     throw new Error(
       "sortDirection must be either 'asc' or 'desc'."
@@ -253,7 +253,6 @@ function getFilterColumnButtonElement(
 
   if (operator) {
     cy.get(agGridElement)
-      .find(".ag-filter")
       .find(".ag-picker-field-wrapper")
       .filter(":visible")
       .eq(searchInputIndex)
@@ -307,10 +306,10 @@ function applyColumnFilter(agGridElement, hasApplyButton, noMenuTabs) {
     cy.get(agGridElement)
       .find(".ag-filter-apply-panel-button")
       .contains("Apply")
-      .click().wait(500);
+      .click();
   }
   if (!noMenuTabs) {
-    getMenuTabElement(agGridElement, filterTab.filter).click().wait(500);
+    getMenuTabElement(agGridElement, filterTab.filter).click();
   }
 }
 
@@ -335,8 +334,8 @@ function toggleColumnCheckboxFilter(
     .siblings("div")
     .find("input")
     .then(($ele) => {
-      if (doSelect) cy.wrap($ele).check().wait(500);
-      else cy.wrap($ele).uncheck().wait(500);
+      if (doSelect) cy.wrap($ele).check();
+      else cy.wrap($ele).uncheck();
     });
 }
 

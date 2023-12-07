@@ -462,7 +462,7 @@ describe("ag-grid get data scenarios", () => {
       searchCriteria: 
       {
         columnName: "Condition",
-        operator: filterOperator.startsWith,
+        operator: "Starts with",
         filterValue: 'f',
         searchInputIndex: 0,
       },
@@ -475,7 +475,7 @@ describe("ag-grid get data scenarios", () => {
       searchCriteria: 
       {
         columnName: "Condition",
-        operator: filterOperator.endsWith,
+        operator:"Ends with",
         filterValue: "ir",
         searchInputIndex: 1,
       },
