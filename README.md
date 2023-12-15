@@ -70,6 +70,27 @@ The correct command will return the following:
 </br>
 </br>
 
+To get data as an array and not as an object, set the `valuesArray` flag in the options object.
+
+```javascript
+cy.get("#myGrid").getAgGridData({ valuesArray: true })
+```
+
+This command will return the following:
+```json
+{
+  "headers": ["Year", "Make", "Model"],
+  "rows": [["2020", "Toyota", "Celica"],
+    ["2020", "Ford", "Mondeo"],
+    ["2020", "Porsche", "Boxter"],
+    ["2020", "BMW", "3-series"],
+    ["2020", "Mercedes", "GLC300"]
+  ]
+}
+```
+</br>
+</br>
+
 ### Getting Select Row Data
 To only get certain rows of data, pass the header values into the `getAgGridData()` command, like so:
 
