@@ -38,7 +38,7 @@ export const getAgGridElements = (agGridElement, options = {}) => {
 
 function _getAgGrid(agGridElement, options = {}, returnElements) {
   const agGridColumnSelectors =
-    ".ag-pinned-left-cols-container^.ag-center-cols-clipper^.ag-pinned-right-cols-container";
+    ".ag-pinned-left-cols-container^.ag-center-cols-clipper^.ag-center-cols-viewport^.ag-pinned-right-cols-container";
   if (agGridElement.get().length > 1)
     throw new Error(
       `Selector "${agGridElement.selector}" returned more than 1 element.`
@@ -150,20 +150,26 @@ function getColumnHeaderElement(agGridElement, columnName) {
  * @returns
  */
 export function sortColumnBy(agGridElement, columnName, sortDirection) {
+    if(sortDirection.toLowerCase() === "ascending"){
+      sortDirection = "asc"
+    }else if(sortDirection.toLowerCase() === "descending"){
+      sortDirection = "desc"
+    }
+
   if (sortDirection === sort.ascending || sortDirection === sort.descending) {
     return getColumnHeaderElement(agGridElement, columnName)
-      .parents(".ag-header-cell")
-      .invoke("attr", "aria-sort")
+      .parents(".ag-header-cell .ag-cell-label-container")
+      .invoke("attr", "class")
       .then((value) => {
         cy.log(`sort: ${sortDirection}`);
-        if (value !== sortDirection) {
+        if(!value.includes(`ag-header-cell-sorted-${sortDirection}`)){
           getColumnHeaderElement(agGridElement, columnName).click().wait(250);
           sortColumnBy(agGridElement, columnName, sortDirection);
         }
-      });
+      }).wait(100);
   } else {
     throw new Error(
-      "sortDirection must be either 'ascending' or 'descending'."
+      "sortDirection must be either 'asc' or 'desc'."
     );
   }
 }
@@ -246,8 +252,10 @@ function getFilterColumnButtonElement(
 
   if (operator) {
     cy.get(agGridElement)
+      .find(".ag-filter")
       .find(".ag-picker-field-wrapper")
       .filter(":visible")
+      .eq(searchInputIndex)
       .click();
     cy.get(agGridElement)
       .find(".ag-popup")
@@ -298,10 +306,10 @@ function applyColumnFilter(agGridElement, hasApplyButton, noMenuTabs) {
     cy.get(agGridElement)
       .find(".ag-filter-apply-panel-button")
       .contains("Apply")
-      .click();
+      .click().wait(500);
   }
   if (!noMenuTabs) {
-    getMenuTabElement(agGridElement, filterTab.filter).click();
+    getMenuTabElement(agGridElement, filterTab.filter).click().wait(500);
   }
 }
 
@@ -326,8 +334,8 @@ function toggleColumnCheckboxFilter(
     .siblings("div")
     .find("input")
     .then(($ele) => {
-      if (doSelect) cy.wrap($ele).check();
-      else cy.wrap($ele).uncheck();
+      if (doSelect) cy.wrap($ele).check().wait(500);
+      else cy.wrap($ele).uncheck().wait(500);
     });
 }
 
@@ -338,19 +346,9 @@ function populateSearchCriteria(
   selectAllLocaleText = 'Select All'
   ) {
   const options = {};
-  //@ts-ignore
-  options.searchCriteria = {};
-  //@ts-ignore
-  options.searchCriteria.columnName = searchCriteria.columnName;
-  //@ts-ignore
-  options.searchCriteria.filterValue = searchCriteria.filterValue;
-  //@ts-ignore
-  options.searchCriteria.isMultiFilter = searchCriteria.isMultiFilter;
-  //@ts-ignore
+  options.searchCriteria = {...searchCriteria};
   options.selectAllLocaleText = selectAllLocaleText;
-  //@ts-ignore
   options.hasApplyButton = hasApplyButton;
-  //@ts-ignore
   options.noMenuTabs = noMenuTabs;
   return options;
 }
