@@ -9,7 +9,7 @@ import { filterOperator } from "../../src/agGrid/filterOperator.enum";
 
 const _pageSize = 5;
 const agGridSelector = "#myGrid";
-const allData = [
+const expectedPaginatedTableData = [
   [
     { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "fair", Price: "35000" },
     { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "excellent", Price: "32000" },
@@ -46,17 +46,17 @@ describe("ag-grid get data scenarios", () => {
     cy.get(".ag-cell", { timeout: 10000 }).should("be.visible");
   });
 
-  it("verify paginated table data - include all columns", () => {
+  it("verify paginated table data - any order - include all columns", () => {
     cy.get(agGridSelector).agGridValidatePaginatedTable(
-      allData
+      expectedPaginatedTableData
     );
   });
 
-  it("verify exact order table data - include all columns", () => {
+  it("verify paginated table data - exact order - include all columns", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.agGridValidateRowsExactOrder(actualTableData, allData[0]);
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedPaginatedTableData[0]);
       });
   });
 
@@ -66,7 +66,7 @@ describe("ag-grid get data scenarios", () => {
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
-        cy.agGridValidateRowsExactOrder(actualTableData, allData[0]);
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedPaginatedTableData[0]);
       });
   });
 
