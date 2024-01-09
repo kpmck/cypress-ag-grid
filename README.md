@@ -9,6 +9,7 @@ Cypress plugin for interacting with and validating against ag grid.
         - [Getting Select Row Data](#getting-select-row-data)
         - [Getting Elements From the Grid](#getting-elements-from-the-grid)
         - [Sorting Columns](#sorting-columns)
+        - [Pinning Columns](#pinning-columns)
     + [Grid Filtering](#)
         - [Filter Options](#filter-options)
         - [Filter by Text - Column Menu](#filter-by-text---column-menu)
@@ -119,6 +120,21 @@ Example:
 
 ```javascript
 cy.get("#myGrid").agGridSortColumn("Model", "descending");
+```
+</br>
+</br>
+
+### Pinning Columns
+This command will pin the specified column.
+<b>Definition</b>
+`.agGridPinColumn(columnName: string, pin: ['left', 'right', null])`
+
+Example:
+```javascript
+cy.get("#myGrid").agGridPinColumn("Model", "left") // Pins the "Model" column to the left
+cy.get("#myGrid").agGridPinColumn("Model", "right") // Pins the "Model" column to the right
+cy.get("#mGrid").agGridPinColumn("Model") // Removes the pin
+
 ```
 </br>
 </br>
