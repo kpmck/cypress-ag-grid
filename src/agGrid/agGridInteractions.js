@@ -1,7 +1,6 @@
 /// <reference types="cypress" />
 import { sort } from "./sort.enum";
 import { filterTab } from "./menuTab.enum";
-import { filterOperator } from "./filterOperator.enum";
 
 /**
  * Uses the attribute value's index and sorts the data accordingly.
@@ -46,6 +45,43 @@ function _getAgGrid(agGridElement, options = {}, returnElements) {
 
   const tableElement = agGridElement.get()[0].querySelectorAll(".ag-root")[0];
   const agGridSelectors = agGridColumnSelectors.split("^");
+  const headersArr = [];
+  const groupHeaders = [
+    ...tableElement.querySelectorAll(
+      ".ag-header-row-column-group [aria-colindex]"
+    ),
+  ]
+    .sort(sortElementsByAttributeValue("aria-colindex"))
+    .map((headerElement) => {
+      let span = 1;
+      if (headerElement.attributes["aria-colspan"]) {
+        span = headerElement.attributes["aria-colspan"].nodeValue;
+      }
+      // Check if the elements returned are already .ag-header-cell-text elements
+      // If not, query for that element and return the text content
+      let headerCells = [
+        ...headerElement.querySelectorAll(".ag-header-cell-text"),
+      ];
+      if (headerCells.length === 0) {
+        for (let i = 0; i < span; i++) {
+          headersArr.push([headerElement].map((e) => e.textContent.trim()));
+        }
+        return [headerElement].map((e) => e.textContent.trim());
+      } else {
+        for (let i = 0; i < span; i++) {
+          headersArr.push(
+            [...headerElement.querySelectorAll(".ag-header-cell-text")].map(
+              (e) => e.textContent.trim()
+            )
+          );
+        }
+        return [...headerElement.querySelectorAll(".ag-header-cell-text")].map(
+          (e) => e.textContent.trim()
+        );
+      }
+    })
+    .flat();
+
   const headers = [
     ...tableElement.querySelectorAll(".ag-header-row-column [aria-colindex]"),
   ]
@@ -65,6 +101,11 @@ function _getAgGrid(agGridElement, options = {}, returnElements) {
       }
     })
     .flat();
+
+  const joinedHeaders = [];
+  for (let j = 0; j < headers.length; j++) {
+    joinedHeaders.push(headersArr[j] + " " + headers[j]);
+  }
 
   let allRows = [];
   let rows = [];
@@ -121,13 +162,14 @@ function _getAgGrid(agGridElement, options = {}, returnElements) {
     row.reduce((acc, curr, idx) => {
       if (
         //@ts-ignore
-        (options.onlyColumns && !options.onlyColumns.includes(headers[idx])) ||
-        headers[idx] === undefined
+        (options.onlyColumns &&
+          !options.onlyColumns.includes(joinedHeaders[idx])) ||
+        joinedHeaders[idx] === undefined
       ) {
         // dont include columns that are not present in onlyColumns, or if the header is undefined
         return { ...acc };
       }
-      return { ...acc, [headers[idx]]: curr };
+      return { ...acc, [joinedHeaders[idx]]: curr };
     }, {})
   );
 }
@@ -239,18 +281,17 @@ function getFilterColumnButtonElement(
  * @param operator (optional) use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values)
  * @param noMenuTabs (optional) boolean indicating if the menu has tabs.
  */
- function filterBySearchTerm(agGridElement, options) {
+function filterBySearchTerm(agGridElement, options) {
   const filterValue = options.searchCriteria.filterValue;
   const operator = options.searchCriteria.operator;
   const searchInputIndex = options.searchCriteria.searchInputIndex || 0;
   const isMultiFilter = options.searchCriteria.isMultiFilter;
   const noMenuTabs = options.noMenuTabs;
-  
+
   // Navigate to the filter tab
   if (!noMenuTabs) {
     selectMenuTab(agGridElement, filterTab.filter);
   }
-
   if (operator) {
     cy.get(agGridElement)
       .find(".ag-filter")
@@ -272,34 +313,23 @@ function getFilterColumnButtonElement(
     .find(".ag-popup-child")
     .find("input")
     .filter(":visible")
-    .as("filterInput")
+    .as("filterInput");
 
-    // If it's a multi filter, de-select the 'select-all' checkbox
-    if(isMultiFilter){
-      const selectAllText = options.selectAllLocaleText || "Select All";
-      toggleColumnCheckboxFilter(
-        agGridElement,
-        selectAllText,
-        false,
-        true
-      );
-    }
+  // If it's a multi filter, de-select the 'select-all' checkbox
+  if (isMultiFilter) {
+    const selectAllText = options.selectAllLocaleText || "Select All";
+    toggleColumnCheckboxFilter(agGridElement, selectAllText, false, true);
+  }
 
-    // Get the saved filter input and enter the search term
-    if(operator !== filterOperator.blank && operator !== filterOperator.notBlank){      
-      cy.get("@filterInput").then(($ele)=>{
-        cy.wrap($ele)
-        .eq(searchInputIndex)
-        .clear()
-        .type(filterValue)
-        .wait(500);  
-      })
-    }
+  // Get the saved filter input and enter the search term
+  cy.get("@filterInput").then(($ele) => {
+    cy.wrap($ele).eq(searchInputIndex).clear().type(filterValue).wait(500);
+  });
 
-    // Finally, if a multi-filter, select the filter value's checkbox
-    if(isMultiFilter){
-      toggleColumnCheckboxFilter(agGridElement, filterValue, true, true)
-    }
+  // Finally, if a multi-filter, select the filter value's checkbox
+  if (isMultiFilter) {
+    toggleColumnCheckboxFilter(agGridElement, filterValue, true, true);
+  }
 }
 
 function applyColumnFilter(agGridElement, hasApplyButton, noMenuTabs) {
@@ -344,8 +374,8 @@ function populateSearchCriteria(
   searchCriteria,
   hasApplyButton = false,
   noMenuTabs = false,
-  selectAllLocaleText = 'Select All'
-  ) {
+  selectAllLocaleText = "Select All"
+) {
   const options = {};
   options.searchCriteria = {...searchCriteria};
   options.selectAllLocaleText = selectAllLocaleText;
@@ -388,10 +418,7 @@ function _filterBySearchTextColumnMenu(agGridElement, options) {
     agGridElement,
     options.searchCriteria.columnName
   ).click();
-  filterBySearchTerm(
-    agGridElement,
-    options
-  );
+  filterBySearchTerm(agGridElement, options);
   applyColumnFilter(agGridElement, options.hasApplyButton, options.noMenuTabs);
 }
 
@@ -431,10 +458,7 @@ function _filterBySearchTextColumnFloatingFilter(agGridElement, options) {
       options.searchCriteria.columnName,
       true
     ).click();
-    filterBySearchTerm(
-      agGridElement,
-      options
-    );
+    filterBySearchTerm(agGridElement, options);
     applyColumnFilter(
       agGridElement,
       options.hasApplyButton,
