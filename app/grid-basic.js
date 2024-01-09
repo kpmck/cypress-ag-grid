@@ -1,9 +1,17 @@
 // specify the columns
 const columnDefs = [
-  { field: "year", pinned: "left"},
+  { field: "year", pinned: "left" },
   { field: "make", rowGroup: false, pinned: "left" },
   { field: "model", filter: true },
-  { field: "price", pinned: "right", floatingFilter: false, sortable: false, editable: true, cellEditor: 'agTextCellEditor'  },
+  { field: "condition",filter: "agTextColumnFilter", filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: 'OR', } },
+  {
+    field: "price",
+    pinned: "right",
+    floatingFilter: false,
+    sortable: false,
+    editable: true,
+    cellEditor: "agTextCellEditor",
+  },
 ];
 
 const autoGroupColumnDef = {
@@ -45,26 +53,24 @@ const eGridDiv = document.querySelector("#myGrid");
 new agGrid.Grid(eGridDiv, gridOptions);
 
 // Grab the grid data from the supplied API endpoint
-agGrid
-  .simpleHttpRequest({
-    url: "./data.json",
-  })
+fetch("./data.json")
+  .then(res => res.json())
   .then((data) => {
-    gridOptions.api.setRowData(data);
+    gridOptions.api.setGridOption('rowData', data);
   });
 
 function autoSizeAllColumns() {
   var allColumnIds = [];
-  gridOptions.columnApi.getAllColumns().forEach(function (column) {
+  gridOptions.api.getAllColumns().forEach(function (column) {
     allColumnIds.push(column.colId);
   });
-  gridOptions.columnApi.autoSizeColumns(allColumnIds);
+  gridOptions.api.autoSizeColumns(allColumnIds);
 }
 
 // If the Cypress test is running, ensure all columns fit within the window
 if (window.Cypress) {
   gridOptions.api.sizeColumnsToFit();
 } else {
-    // Otherwise auto-size columns the way we wish to view the grid in production.
-    autoSizeAllColumns();
+  // Otherwise auto-size columns the way we wish to view the grid in production.
+  autoSizeAllColumns();
 }

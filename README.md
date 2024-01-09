@@ -136,7 +136,7 @@ options: {
         isMultiFilter?: boolean;
     }];
     hasApplyButton?: boolean;
-    noMenuTab?: boolean;
+    noMenuTabs?: boolean;
     selectAllLocaleText: string;
 }
 

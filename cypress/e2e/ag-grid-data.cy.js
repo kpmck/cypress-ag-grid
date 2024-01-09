@@ -19,35 +19,35 @@ describe("ag-grid get data scenarios", () => {
   it("verify paginated table data - include all columns", () => {
     const expectedPaginatedTableData = [
       [
-        { Year: "2020", Make: "Toyota", Model: "Celica", Price: "35000" },
-        { Year: "2020", Make: "Ford", Model: "Mondeo", Price: "32000" },
-        { Year: "2020", Make: "Porsche", Model: "Boxter", Price: "72000" },
-        { Year: "2020", Make: "BMW", Model: "3-series", Price: "45000" },
-        { Year: "2020", Make: "Mercedes", Model: "GLC300", Price: "53000" },
+        { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "fair", Price: "35000" },
+        { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "excellent", Price: "32000" },
+        { Year: "2020", Make: "Porsche", Model: "Boxter", Condition: "good", Price: "72000" },
+        { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", Price: "45000" },
+        { Year: "2020", Make: "Mercedes", Model: "GLC300", Condition: "good", Price: "53000" },
       ],
       [
-        { Year: "2020", Make: "Honda", Model: "Civic", Price: "22000" },
-        { Year: "2020", Make: "Honda", Model: "Accord", Price: "32000" },
-        { Year: "2020", Make: "Ford", Model: "Taurus", Price: "19000" },
-        { Year: "2020", Make: "Hyundai", Model: "Elantra", Price: "22000" },
-        { Year: "2020", Make: "Toyota", Model: "Celica", Price: "5000" },
+        { Year: "2020", Make: "Honda", Model: "Civic", Condition: "poor", Price: "22000" },
+        { Year: "2020", Make: "Honda", Model: "Accord", Condition: "poor", Price: "32000" },
+        { Year: "2020", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "19000" },
+        { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "good", Price: "22000" },
+        { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "poor", Price: "5000" },
       ],
       [
-        { Year: "2020", Make: "Ford", Model: "Mondeo", Price: "25000" },
-        { Year: "2020", Make: "Porsche", Model: "Boxter", Price: "99000" },
-        { Year: "2020", Make: "BMW", Model: "3-series", Price: "32000" },
-        { Year: "2020", Make: "Mercedes", Model: "GLC300", Price: "35000" },
-        { Year: "2011", Make: "Honda", Model: "Civic", Price: "9000" },
+        { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "good", Price: "25000" },
+        { Year: "2020", Make: "Porsche", Model: "Boxter", Condition: "good", Price: "99000" },
+        { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", Price: "32000" },
+        { Year: "2020", Make: "Mercedes", Model: "GLC300", Condition: "excellent", Price: "35000" },
+        { Year: "2011", Make: "Honda", Model: "Civic", Condition: "good", Price: "9000" },
       ],
       [
-        { Year: "2020", Make: "Honda", Model: "Accord", Price: "34000" },
-        { Year: "1990", Make: "Ford", Model: "Taurus", Price: "900" },
-        { Year: "2020", Make: "Hyundai", Model: "Elantra", Price: "3000" },
-        { Year: "2020", Make: "BMW", Model: "2002", Price: "88001" },
-        { Year: "2023", Make: "Hyundai", Model: "Santa Fe", Price: "" },
+        { Year: "2020", Make: "Honda", Model: "Accord", Condition: "good", Price: "34000" },
+        { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "900" },
+        { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "fair", Price: "3000" },
+        { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", Price: "88001" },
+        { Year: "2023", Make: "Hyundai", Model: "Santa Fe", Condition: "excellent", Price: "" },
       ],
     ];
-    cy.get(agGridSelector).agGridValidatePaginatedTable(
+        cy.get(agGridSelector).agGridValidatePaginatedTable(
       expectedPaginatedTableData
     );
   });
@@ -93,7 +93,7 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by checkbox", () => {
     const expectedTableData = [
-      { Year: "2020", Make: "BMW", Model: "2002", Price: "88001" },
+      { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", Price: "88001" },
     ];
     cy.get(agGridSelector).agGridColumnFilterCheckboxMenu({
       searchCriteria: {
@@ -112,10 +112,11 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by checkbox - multiple columns", () => {
     const expectedTableData = [
-      { Year: "2020", Make: "BMW", Model: "3-series", Price: "45000" },
-      { Year: "2020", Make: "BMW", Model: "3-series", Price: "32000" },
-      { Year: "2020", Make: "BMW", Model: "2002", Price: "88001" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", Price: "45000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", Price: "32000" },
+      { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", Price: "88001" },
     ];
+    
     cy.get(agGridSelector).agGridColumnFilterCheckboxMenu({
       searchCriteria: [
         {
@@ -142,9 +143,9 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by text - menu", () => {
     const expectedTableData = [
-      { Year: "2020", Make: "BMW", Model: "3-series", Price: "32000" },
-      { Year: "2020", Make: "Honda", Model: "Accord", Price: "32000" },
-      { Year: "2020", Make: "Ford", Model: "Mondeo", Price: "32000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", Price: "32000" },
+      { Year: "2020", Make: "Honda", Model: "Accord", Condition: "poor", Price: "32000" },
+      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "excellent", Price: "32000" },
     ];
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
     cy.get(agGridSelector).agGridColumnFilterTextMenu({
@@ -164,7 +165,7 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by text - menu - multiple columns", () => {
     const expectedTableData = [
-      { Year: "2020", Make: "BMW", Model: "3-series", Price: "32000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", Price: "32000" },
     ];
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
     cy.get(agGridSelector).agGridColumnFilterTextMenu({
@@ -191,11 +192,12 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by text - floating filter", () => {
     const expectedTableData = [
-      { Year: "2020", Make: "Ford", Model: "Mondeo", Price: "32000" },
-      { Year: "2020", Make: "Ford", Model: "Mondeo", Price: "25000" },
-      { Year: "2020", Make: "Ford", Model: "Taurus", Price: "19000" },
-      { Year: "1990", Make: "Ford", Model: "Taurus", Price: "900" },
+      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "excellent", Price: "32000" },
+      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "good", Price: "25000" },
+      { Year: "2020", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "19000" },
+      { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "900" },
     ];
+    
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
     cy.get(agGridSelector).agGridColumnFilterTextFloating({
       searchCriteria: {
@@ -213,10 +215,11 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by text - floating filter - multiple conditions", () => {
     const expectedTableData = [
-      { Year: "2020", Make: "BMW", Model: "2002", Price: "88001" },
-      { Year: "2020", Make: "BMW", Model: "3-series", Price: "45000" },
-      { Year: "2020", Make: "BMW", Model: "3-series", Price: "32000" },
+      { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", Price: "88001" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", Price: "45000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", Price: "32000" },
     ];
+    
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
     cy.get(agGridSelector).agGridColumnFilterTextFloating({
       searchCriteria: {
@@ -243,7 +246,7 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by text - floating filter - multiple columns", () => {
     const expectedTableData = [
-      { Year: "1990", Make: "Ford", Model: "Taurus", Price: "900" },
+      { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "900" },
     ];
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
     cy.get(agGridSelector).agGridColumnFilterTextFloating({
@@ -271,8 +274,8 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by text - floating filter - multi filter", () => {
     const expectedTableData = [
-      { Year: "2020", Make: "Ford", Model: "Taurus", Price: "19000" },
-      { Year: "1990", Make: "Ford", Model: "Taurus", Price: "900" },
+      { Year: "2020", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "19000" },
+      { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "900" },
     ];
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
     cy.get(agGridSelector).agGridColumnFilterTextFloating({
@@ -431,7 +434,7 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by 'Blank'", () =>{
     const expectedTableData = [
-      { Year: "2023", Make: "Hyundai", Model: "Santa Fe", Price: "" }
+      { Year: "2023", Make: "Hyundai", Model: "Santa Fe", Condition: "excellent", Price: "" }
     ]
 
     cy.get(agGridSelector).agGridColumnFilterTextMenu({
@@ -447,7 +450,46 @@ describe("ag-grid get data scenarios", () => {
       cy.agGridValidateRowsSubset(actualTableData, expectedTableData);
     });  
 
-  })
+  });
+
+  it('able to filter by agTextColumnFilter with join operator', ()=>{
+    const expectedTableData = [
+      { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "fair", Price: "35000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", Price: "45000" },
+      { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "fair", Price: "3000" },
+    ]
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: 
+      {
+        columnName: "Condition",
+        operator: filterOperator.startsWith,
+        filterValue: 'f',
+        searchInputIndex: 0,
+      },
+      
+      multiple: true,
+      hasApplyButton: true,
+    });
+  
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: 
+      {
+        columnName: "Condition",
+        operator: filterOperator.endsWith,
+        filterValue: "ir",
+        searchInputIndex: 1,
+      },
+      
+      multiple: true,
+      hasApplyButton: true,
+    });
+
+    cy.get(agGridSelector)
+    .getAgGridData()
+    .then((actualTableData) => {
+      cy.agGridValidateRowsSubset(actualTableData, expectedTableData);
+    });  
+  });
 });
 
 function removePropertyFromCollection(expectedTableData, columnsToExclude) {

@@ -1,15 +1,15 @@
 export const filterOperator = {
   contains: "Contains",
-  notContains: "Not contains",
+  notContains: "Does not contain",
   equals: "Equals",
-  notEquals: "Not equals",
-  startsWith: "Starts with",
+  notEquals: "Does not equal",
+  startsWith: "Begins with",
   endsWith: "Ends with",
   lessThan: "Less than",
-  lessThanOrEquals: "Less than or equals",
+  lessThanOrEquals: "Less than or equal to",
   greaterThan: "Greater than",
-  greaterThanOrEquals: "Greater than or equals",
-  inRange: "In range",
+  greaterThanOrEquals: "Greater than or equal to",
+  inRange: "Between",
   blank: "Blank",
   notBlank: "Not Blank"
 }
