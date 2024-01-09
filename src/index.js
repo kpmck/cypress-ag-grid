@@ -2,7 +2,7 @@
 
 import {getAgGridData, getAgGridElements, sortColumnBy} from "./agGrid/agGridInteractions"
 import {validateTablePages, validateTableExactOrder, validateEmptyTable, validateTableRowSubset} from "./agGrid/agGridValidations"
-import {filterByCheckboxColumnMenu, filterBySearchTextColumnFloatingFilter, filterBySearchTextColumnMenu, toggleColumnFromSideBar} from "./agGrid/agGridInteractions";
+import {filterByCheckboxColumnMenu, filterBySearchTextColumnFloatingFilter, filterBySearchTextColumnMenu, toggleColumnFromSideBar, pinColumn} from "./agGrid/agGridInteractions";
 
 Cypress.Commands.add('getAgGridData', { prevSubject: true }, getAgGridData);
 Cypress.Commands.add('getAgGridElements', {prevSubject: true}, getAgGridElements);
@@ -17,3 +17,4 @@ Cypress.Commands.add('agGridValidateRowsSubset', {prevSubject: 'optional'}, vali
 Cypress.Commands.add('agGridValidateEmptyTable', {prevSubject: 'optional'}, validateEmptyTable)
 
 Cypress.Commands.add('agGridToggleColumnsSideBar', {prevSubject: true}, toggleColumnFromSideBar)
+Cypress.Commands.add('agGridPinColumn', {prevSubject: true}, pinColumn)
