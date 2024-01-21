@@ -17,5 +17,6 @@
   { "Year": "2020", "Make": "Honda", "Model": "Accord", "Condition": "good", "Price": "34000" },
   { "Year": "1990", "Make": "Ford", "Model": "Taurus", "Condition": "excellent", "Price": "900" },
   { "Year": "2020", "Make": "Hyundai", "Model": "Elantra", "Condition": "fair", "Price": "3000" },
-  { "Year": "2020", "Make": "BMW", "Model": "2002", "Condition": "excellent", "Price": "88001" }
+  { "Year": "2020", "Make": "BMW", "Model": "2002", "Condition": "excellent", "Price": "88001" },
+  { "Year": "2020", "Make": "Toyota", "Model": "Celica", "Condition": "fair", "Price": "35000" }
 ]
