@@ -38,6 +38,9 @@ const expectedPaginatedTableData = [
     { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", Price: "88001" },
     { Year: "2023", Make: "Hyundai", Model: "Santa Fe", Condition: "excellent", Price: "" },
   ],
+  [
+    { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "fair", Price: "35000" },
+  ]
 ];
 
 describe("ag-grid get data scenarios", () => {
@@ -45,6 +48,31 @@ describe("ag-grid get data scenarios", () => {
     cy.visit("../app/index.html");
     cy.get(".ag-cell", { timeout: 10000 }).should("be.visible");
   });
+
+  it("verify data when multiple rows are identical", ()=>{
+
+    const expectedTableData = 
+    [
+      { "Year": "2020", "Make": "Toyota", "Model": "Celica", "Condition": "fair", "Price": "35000" },
+      { "Year": "2020", "Make": "Toyota", "Model": "Celica", "Condition": "poor", "Price": "5000" },
+      { "Year": "2020", "Make": "Toyota", "Model": "Celica", "Condition": "fair", "Price": "35000" },
+    ]
+    cy.get(agGridSelector).agGridColumnFilterCheckboxMenu({
+      searchCriteria: {
+        columnName: "Model",
+        filterValue: "Celica",
+      },
+      selectAllLocaleText: "Select All", // This is optional if you are using localText for ag grid
+      hasApplyButton: true,
+    });
+
+    cy.get(agGridSelector)
+    .getAgGridData()
+    .then((actualTableData) => {
+      cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+    });
+
+  })
 
   it("verify paginated table data - any order - include all columns", () => {
     cy.get(agGridSelector).agGridValidatePaginatedTable(

@@ -100,6 +100,14 @@ function _getAgGrid(agGridElement, options = {}, returnElements) {
     return ele.length;
   });
 
+  // Remove duplicate entries from allRows
+  // In some instances we see cell duplication for non-unique rows
+  allRows = allRows.map((row)=>{
+    return row.filter((cell, index)=>{
+      return row.indexOf(cell) === index;
+    })
+  })
+
   if (!allRows.length) rows = [];
   else {
     rows = allRows
