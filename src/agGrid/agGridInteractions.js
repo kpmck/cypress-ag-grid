@@ -3,6 +3,25 @@ import { sort } from "./sort.enum";
 import { filterTab } from "./menuTab.enum";
 import { filterOperator } from "./filterOperator.enum";
 
+export const agGridWaitForAnimation = (subject) => {
+  return cy.get(subject).then(async (el) => {
+    if (!el) {
+      throw new Error(`Couldn't find element ${subject}`)
+    }
+    await Promise.all(
+      el[0].getAnimations({ subtree: true }).map((animation) => {
+        return animation.finished.catch((error) => {
+          if (error.name === 'AbortError') return
+          console.error('error', error, error.name)
+          throw error
+        })
+
+      })
+    )
+    return subject
+  })
+}
+
 /**
  * Uses the attribute value's index and sorts the data accordingly.
  * For our purposes, we are getting the attribute with the items' indices and sorting accordingly.
@@ -24,7 +43,9 @@ function sortElementsByAttributeValue(attribute) {
  * @param options Provide an array of columns you wish to exclude from the table retrieval.
  */
 export const getAgGridData = (agGridElement, options = {}) => {
-  return _getAgGrid(agGridElement, options, false);
+  return cy.get(agGridElement).agGridWaitForAnimation().then(() => {
+    return cy.wrap(_getAgGrid(agGridElement, options, false))
+  })
 };
 
 /**
@@ -33,7 +54,9 @@ export const getAgGridData = (agGridElement, options = {}) => {
  * @param options Provide an array of columns you wish to exclude from the table retrieval.
  */
 export const getAgGridElements = (agGridElement, options = {}) => {
-  return _getAgGrid(agGridElement, options, true);
+  return cy.get(agGridElement).agGridWaitForAnimation().then(() => {
+    return cy.wrap(_getAgGrid(agGridElement, options, true))
+  })
 };
 
 function _getAgGrid(agGridElement, options = {}, returnElements) {
@@ -71,7 +94,7 @@ function _getAgGrid(agGridElement, options = {}, returnElements) {
 
   agGridSelectors.forEach((selector) => {
     const _rows = [
-      ...tableElement.querySelectorAll(`${selector}:not(.ag-hidden) .ag-row`),
+      ...tableElement.querySelectorAll(`${selector}:not(.ag-hidden) .ag-row:not(.ag-opacity-zero)`),
     ]
       // Sort rows by their row-index attribute value
       .sort(sortElementsByAttributeValue("row-index"))
@@ -164,17 +187,20 @@ export function sortColumnBy(agGridElement, columnName, sortDirection) {
   }
 
   if (sortDirection === sort.ascending || sortDirection === sort.descending) {
-    return getColumnHeaderElement(agGridElement, columnName)
+    const result = getColumnHeaderElement(agGridElement, columnName)
       .parents(".ag-header-cell .ag-cell-label-container")
       .invoke("attr", "class")
       .then((value) => {
         cy.log(`sort: ${sortDirection}`);
         if (!value.includes(`ag-header-cell-sorted-${sortDirection}`)) {
-          getColumnHeaderElement(agGridElement, columnName).click().wait(250);
+          getColumnHeaderElement(agGridElement, columnName).click()
           sortColumnBy(agGridElement, columnName, sortDirection);
         }
       })
-      .wait(100);
+    getColumnHeaderElement(agGridElement, columnName)
+      .parents(".ag-header-cell .ag-cell-label-container")
+      .agGridWaitForAnimation()
+    return result
   } else {
     throw new Error("sortDirection must be either 'asc' or 'desc'.");
   }
@@ -291,7 +317,7 @@ function filterBySearchTerm(agGridElement, options) {
     operator !== filterOperator.notBlank
   ) {
     cy.get("@filterInput").then(($ele) => {
-      cy.wrap($ele).eq(searchInputIndex).clear().type(filterValue).wait(500);
+      cy.wrap($ele).eq(searchInputIndex).clear().type(filterValue) //.wait(500);
     });
   }
 
@@ -307,10 +333,9 @@ function applyColumnFilter(agGridElement, hasApplyButton, noMenuTabs) {
       .find(".ag-filter-apply-panel-button")
       .contains("Apply")
       .click()
-      .wait(500);
   }
   if (!noMenuTabs) {
-    getMenuTabElement(agGridElement, filterTab.filter).click().wait(500);
+    getMenuTabElement(agGridElement, filterTab.filter).click() //.wait(500);
   }
 }
 
@@ -335,8 +360,8 @@ function toggleColumnCheckboxFilter(
     .siblings("div")
     .find("input")
     .then(($ele) => {
-      if (doSelect) cy.wrap($ele).check().wait(500);
-      else cy.wrap($ele).uncheck().wait(500);
+      if (doSelect) cy.wrap($ele).check()
+      else cy.wrap($ele).uncheck()
     });
 }
 
@@ -556,7 +581,7 @@ export function toggleColumnFromSideBar(agGridElement, columnName, doRemove) {
       if (!$columnFilterInputField.is(":visible")) {
         cy.get(".ag-side-buttons").find("span").contains("Columns").click();
       }
-      cy.wrap($columnFilterInputField).clear().wait(250).type(columnName);
+      cy.wrap($columnFilterInputField).clear().type(columnName);
       cy.get(".ag-column-select-column-label")
         .contains(columnName)
         .parent()
