@@ -311,11 +311,7 @@ function filterBySearchTerm(agGridElement, options) {
     cy.get(agGridElement)
       .find(".ag-popup .ag-list")
       .find("span")
-      .contains(operator)
-      .then(($ele) => {
-        //Have to use the unwrapped element, since Cypress .click() event does not appropriately select the operator
-        $ele.trigger("click");
-      });
+      .contains(operator).click()
   }
   // Input filter term and allow grid a moment to render the results
   cy.get(agGridElement)
