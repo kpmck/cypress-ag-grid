@@ -3,6 +3,37 @@ import { sort } from "./sort.enum";
 import { filterTab } from "./menuTab.enum";
 import { filterOperator } from "./filterOperator.enum";
 
+function isRowNotDestroyed(rowElement) {
+  const rect = rowElement.getBoundingClientRect();
+  const viewPortRect = rowElement.parentElement.getBoundingClientRect();
+
+  return (
+    rect.top >= viewPortRect.top &&
+    rect.left >= viewPortRect.left &&
+    rect.bottom <= (viewPortRect.bottom) &&
+    rect.right <= (viewPortRect.right)
+  );
+}
+
+export const agGridWaitForAnimation = (subject) => {
+  return cy.get(subject).then(async (el) => {
+    if (!el) {
+      throw new Error(`Couldn't find element ${subject}`)
+    }
+    await Promise.all(
+      el[0].getAnimations({ subtree: true }).map((animation) => {
+        return animation.finished.catch((error) => {
+          if (error.name === 'AbortError') return
+          console.error('error', error, error.name)
+          throw error
+        })
+
+      })
+    )
+    return subject
+  })
+}
+
 /**
  * Uses the attribute value's index and sorts the data accordingly.
  * For our purposes, we are getting the attribute with the items' indices and sorting accordingly.
@@ -24,7 +55,9 @@ function sortElementsByAttributeValue(attribute) {
  * @param options Provide an array of columns you wish to exclude from the table retrieval.
  */
 export const getAgGridData = (agGridElement, options = {}) => {
-  return _getAgGrid(agGridElement, options, false);
+  return cy.get(agGridElement).agGridWaitForAnimation().then(() => {
+    return _getAgGrid(agGridElement, options, false)
+  })
 };
 
 /**
@@ -33,7 +66,9 @@ export const getAgGridData = (agGridElement, options = {}) => {
  * @param options Provide an array of columns you wish to exclude from the table retrieval.
  */
 export const getAgGridElements = (agGridElement, options = {}) => {
-  return _getAgGrid(agGridElement, options, true);
+  return cy.get(agGridElement).agGridWaitForAnimation().then(() => {
+    return _getAgGrid(agGridElement, options, true)
+  })
 };
 
 function _getAgGrid(agGridElement, options = {}, returnElements) {
@@ -71,8 +106,16 @@ function _getAgGrid(agGridElement, options = {}, returnElements) {
 
   agGridSelectors.forEach((selector) => {
     const _rows = [
-      ...tableElement.querySelectorAll(`${selector}:not(.ag-hidden) .ag-row`),
+      ...tableElement.querySelectorAll(`${selector}:not(.ag-hidden) .ag-row:not(.ag-opacity-zero)`),
     ]
+      // When animation is enabled, ag-grid destroys rows in 2 phases, 
+      // first it runs an animation to place rows to be destroyed just outside
+      // the viewport.
+      // In the second phase those rows are removed from the DOM.
+      // Because we get here AFTER all animations are finished, it is possible,
+      // those rows are still in the DOM, but are not visible.
+      // therefore those rows should be filtered out.
+      .filter(isRowNotDestroyed)
       // Sort rows by their row-index attribute value
       .sort(sortElementsByAttributeValue("row-index"))
       .map((row) => {
@@ -100,42 +143,44 @@ function _getAgGrid(agGridElement, options = {}, returnElements) {
     return ele.length;
   });
 
-  if (!allRows.length) rows = [];
-  else {
-    rows = allRows
-      .filter((rowCells) => rowCells.length)
-      .map((rowCells) =>
-        rowCells
-          .sort(sortElementsByAttributeValue("aria-colindex"))
-          .map((e) => {
-            if (returnElements) {
-              return e;
-            } else {
-              return e.textContent.trim();
-            }
-          })
-      );
-  }
+  return cy.wrap(null).then(() => {
+    if (!allRows.length) rows = [];
+    else {
+      rows = allRows
+        .filter((rowCells) => rowCells.length)
+        .map((rowCells) =>
+          rowCells
+            .sort(sortElementsByAttributeValue("aria-colindex"))
+            .map((e) => {
+              if (returnElements) {
+                return e;
+              } else {
+                return e.textContent.trim();
+              }
+            })
+        );
+    }
 
-  // if options.rawValues = true, return headers & rows values as arrays instead of mapping as objects
-  if (options.valuesArray) {
-    return { headers, rows };
-  }
+    // if options.rawValues = true, return headers & rows values as arrays instead of mapping as objects
+    if (options.valuesArray) {
+      return { headers, rows };
+    }
 
-  // return structured object from headers and rows variables
-  return rows.map((row) =>
-    row.reduce((acc, curr, idx) => {
-      if (
-        //@ts-ignore
-        (options.onlyColumns && !options.onlyColumns.includes(headers[idx])) ||
-        headers[idx] === undefined
-      ) {
-        // dont include columns that are not present in onlyColumns, or if the header is undefined
-        return { ...acc };
-      }
-      return { ...acc, [headers[idx]]: curr };
-    }, {})
-  );
+    // return structured object from headers and rows variables
+    return rows.map((row) =>
+      row.reduce((acc, curr, idx) => {
+        if (
+          //@ts-ignore
+          (options.onlyColumns && !options.onlyColumns.includes(headers[idx])) ||
+          headers[idx] === undefined
+        ) {
+          // dont include columns that are not present in onlyColumns, or if the header is undefined
+          return { ...acc };
+        }
+        return { ...acc, [headers[idx]]: curr };
+      }, {})
+    );
+  })
 }
 
 /**
@@ -170,11 +215,10 @@ export function sortColumnBy(agGridElement, columnName, sortDirection) {
       .then((value) => {
         cy.log(`sort: ${sortDirection}`);
         if (!value.includes(`ag-header-cell-sorted-${sortDirection}`)) {
-          getColumnHeaderElement(agGridElement, columnName).click().wait(250);
+          getColumnHeaderElement(agGridElement, columnName).click()
           sortColumnBy(agGridElement, columnName, sortDirection);
         }
       })
-      .wait(100);
   } else {
     throw new Error("sortDirection must be either 'asc' or 'desc'.");
   }
@@ -257,20 +301,17 @@ function filterBySearchTerm(agGridElement, options) {
   }
 
   if (operator) {
-    cy.get(agGridElement)
+    const elem = cy.get(agGridElement)
       .find(".ag-filter")
       .find(".ag-picker-field-wrapper")
       .filter(":visible")
       .eq(searchInputIndex)
-      .click();
+    cy.get(agGridElement).agGridWaitForAnimation()
+    elem.click()
     cy.get(agGridElement)
-      .find(".ag-popup")
+      .find(".ag-popup .ag-list")
       .find("span")
-      .contains(operator)
-      .then(($ele) => {
-        //Have to use the unwrapped element, since Cypress .click() event does not appropriately select the operator
-        $ele.trigger("click");
-      });
+      .contains(operator).click()
   }
   // Input filter term and allow grid a moment to render the results
   cy.get(agGridElement)
@@ -291,7 +332,7 @@ function filterBySearchTerm(agGridElement, options) {
     operator !== filterOperator.notBlank
   ) {
     cy.get("@filterInput").then(($ele) => {
-      cy.wrap($ele).eq(searchInputIndex).clear().type(filterValue).wait(500);
+      cy.wrap($ele).eq(searchInputIndex).clear().type(filterValue)
     });
   }
 
@@ -307,10 +348,9 @@ function applyColumnFilter(agGridElement, hasApplyButton, noMenuTabs) {
       .find(".ag-filter-apply-panel-button")
       .contains("Apply")
       .click()
-      .wait(500);
   }
   if (!noMenuTabs) {
-    getMenuTabElement(agGridElement, filterTab.filter).click().wait(500);
+    getMenuTabElement(agGridElement, filterTab.filter).click()
   }
 }
 
@@ -335,8 +375,8 @@ function toggleColumnCheckboxFilter(
     .siblings("div")
     .find("input")
     .then(($ele) => {
-      if (doSelect) cy.wrap($ele).check().wait(500);
-      else cy.wrap($ele).uncheck().wait(500);
+      if (doSelect) cy.wrap($ele).check()
+      else cy.wrap($ele).uncheck()
     });
 }
 
@@ -556,7 +596,8 @@ export function toggleColumnFromSideBar(agGridElement, columnName, doRemove) {
       if (!$columnFilterInputField.is(":visible")) {
         cy.get(".ag-side-buttons").find("span").contains("Columns").click();
       }
-      cy.wrap($columnFilterInputField).clear().wait(250).type(columnName);
+      cy.get(agGridElement).agGridWaitForAnimation()
+      cy.wrap($columnFilterInputField).clear().type(columnName);
       cy.get(".ag-column-select-column-label")
         .contains(columnName)
         .parent()
