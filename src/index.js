@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-import {agGridWaitForAnimation, getAgGridData, getAgGridElements, sortColumnBy} from "./agGrid/agGridInteractions"
+import {getAgGridData, getAgGridElements, sortColumnBy} from "./agGrid/agGridInteractions"
 import {validateTablePages, validateTableExactOrder, validateEmptyTable, validateTableRowSubset} from "./agGrid/agGridValidations"
 import {filterByCheckboxColumnMenu, filterBySearchTextColumnFloatingFilter, filterBySearchTextColumnMenu, toggleColumnFromSideBar, pinColumn} from "./agGrid/agGridInteractions";
 
@@ -18,5 +18,3 @@ Cypress.Commands.add('agGridValidateEmptyTable', {prevSubject: 'optional'}, vali
 
 Cypress.Commands.add('agGridToggleColumnsSideBar', {prevSubject: true}, toggleColumnFromSideBar)
 Cypress.Commands.add('agGridPinColumn', {prevSubject: true}, pinColumn)
-
-Cypress.Commands.add('agGridWaitForAnimation', { prevSubject: 'element' }, agGridWaitForAnimation);
