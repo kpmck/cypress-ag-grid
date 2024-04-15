@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
-import { sort } from "./sort.enum";
-import { filterTab } from "./menuTab.enum";
 import { filterOperator } from "./filterOperator.enum";
+import { filterTab } from "./menuTab.enum";
+import { sort } from "./sort.enum";
 
 function isRowNotDestroyed(rowElement) {
   const rect = rowElement.getBoundingClientRect();
@@ -10,29 +10,32 @@ function isRowNotDestroyed(rowElement) {
   return (
     rect.top >= viewPortRect.top &&
     rect.left >= viewPortRect.left &&
-    rect.bottom <= (viewPortRect.bottom) &&
-    rect.right <= (viewPortRect.right)
+    rect.bottom <= viewPortRect.bottom &&
+    rect.right <= viewPortRect.right
   );
 }
 
-export const agGridWaitForAnimation = (subject) => {
-  return cy.get(subject).then(async (el) => {
-    if (!el) {
-      throw new Error(`Couldn't find element ${subject}`)
-    }
-    await Promise.all(
-      el[0].getAnimations({ subtree: true }).map((animation) => {
-        return animation.finished.catch((error) => {
-          if (error.name === 'AbortError') return
-          console.error('error', error, error.name)
-          throw error
-        })
+export const agGridWaitForAnimation = async (agGridElement) => {
+  if (agGridElement.get().length < 1) {
+    throw new Error(`Couldn't find the element ${agGridElement}`);
+  }
 
-      })
-    )
-    return subject
-  })
-}
+  const animations = agGridElement.get()[0].getAnimations({ subtree: true });
+
+  await Promise.all(
+    animations.map(async (animation) => {
+      try {
+        await animation.finished;
+      } catch (error) {
+        if (error.name === "AbortError") return;
+        console.error("error", error, error.name);
+        throw error;
+      }
+    })
+  );
+
+  return agGridElement;
+};
 
 /**
  * Uses the attribute value's index and sorts the data accordingly.
@@ -54,10 +57,9 @@ function sortElementsByAttributeValue(attribute) {
  * @param agGridElement The get() selector for which ag grid table you wish to retrieve.
  * @param options Provide an array of columns you wish to exclude from the table retrieval.
  */
-export const getAgGridData = (agGridElement, options = {}) => {
-  return cy.get(agGridElement).agGridWaitForAnimation().then(() => {
-    return _getAgGrid(agGridElement, options, false)
-  })
+export const getAgGridData = async (agGridElement, options = {}) => {
+  await agGridWaitForAnimation(agGridElement);
+  return _getAgGrid(agGridElement, options, false);
 };
 
 /**
@@ -65,10 +67,9 @@ export const getAgGridData = (agGridElement, options = {}) => {
  * @param agGridElement The get() selector for which ag grid table you wish to retrieve.
  * @param options Provide an array of columns you wish to exclude from the table retrieval.
  */
-export const getAgGridElements = (agGridElement, options = {}) => {
-  return cy.get(agGridElement).agGridWaitForAnimation().then(() => {
-    return _getAgGrid(agGridElement, options, true)
-  })
+export const getAgGridElements = async (agGridElement, options = {}) => {
+  await agGridWaitForAnimation(agGridElement);
+  return _getAgGrid(agGridElement, options, true);
 };
 
 function _getAgGrid(agGridElement, options = {}, returnElements) {
@@ -106,9 +107,11 @@ function _getAgGrid(agGridElement, options = {}, returnElements) {
 
   agGridSelectors.forEach((selector) => {
     const _rows = [
-      ...tableElement.querySelectorAll(`${selector}:not(.ag-hidden) .ag-row:not(.ag-opacity-zero)`),
+      ...tableElement.querySelectorAll(
+        `${selector}:not(.ag-hidden) .ag-row:not(.ag-opacity-zero)`
+      ),
     ]
-      // When animation is enabled, ag-grid destroys rows in 2 phases, 
+      // When animation is enabled, ag-grid destroys rows in 2 phases,
       // first it runs an animation to place rows to be destroyed just outside
       // the viewport.
       // In the second phase those rows are removed from the DOM.
@@ -143,44 +146,48 @@ function _getAgGrid(agGridElement, options = {}, returnElements) {
     return ele.length;
   });
 
-  return cy.wrap(null).then(() => {
-    if (!allRows.length) rows = [];
-    else {
-      rows = allRows
-        .filter((rowCells) => rowCells.length)
-        .map((rowCells) =>
-          rowCells
-            .sort(sortElementsByAttributeValue("aria-colindex"))
-            .map((e) => {
-              if (returnElements) {
-                return e;
-              } else {
-                return e.textContent.trim();
-              }
-            })
-        );
-    }
+  // Remove duplicate entries from allRows
+  // In some instances we see cell duplication for non-unique rows
+  allRows = allRows.map((row) => {
+    return row.filter((cell, index) => {
+      return row.indexOf(cell) === index;
+    });
+  });
 
-    // if options.rawValues = true, return headers & rows values as arrays instead of mapping as objects
-    if (options.valuesArray) {
-      return { headers, rows };
-    }
-
-    // return structured object from headers and rows variables
-    return rows.map((row) =>
-      row.reduce((acc, curr, idx) => {
-        if (
-          //@ts-ignore
-          (options.onlyColumns && !options.onlyColumns.includes(headers[idx])) ||
-          headers[idx] === undefined
-        ) {
-          // dont include columns that are not present in onlyColumns, or if the header is undefined
-          return { ...acc };
-        }
-        return { ...acc, [headers[idx]]: curr };
-      }, {})
-    );
-  })
+  if (!allRows.length) rows = [];
+  else {
+    rows = allRows
+      .filter((rowCells) => rowCells.length)
+      .map((rowCells) =>
+        rowCells
+          .sort(sortElementsByAttributeValue("aria-colindex"))
+          .map((e) => {
+            if (returnElements) {
+              return e;
+            } else {
+              return e.textContent.trim();
+            }
+          })
+      );
+  }
+  // if options.rawValues = true, return headers & rows values as arrays instead of mapping as objects
+  if (options.valuesArray) {
+    return { headers, rows };
+  }
+  // return structured object from headers and rows variables
+  return rows.map((row) =>
+    row.reduce((acc, curr, idx) => {
+      if (
+        //@ts-ignore
+        (options.onlyColumns && !options.onlyColumns.includes(headers[idx])) ||
+        headers[idx] === undefined
+      ) {
+        // dont include columns that are not present in onlyColumns, or if the header is undefined
+        return { ...acc };
+      }
+      return { ...acc, [headers[idx]]: curr };
+    }, {})
+  );
 }
 
 /**
@@ -215,10 +222,10 @@ export function sortColumnBy(agGridElement, columnName, sortDirection) {
       .then((value) => {
         cy.log(`sort: ${sortDirection}`);
         if (!value.includes(`ag-header-cell-sorted-${sortDirection}`)) {
-          getColumnHeaderElement(agGridElement, columnName).click()
+          getColumnHeaderElement(agGridElement, columnName).click();
           sortColumnBy(agGridElement, columnName, sortDirection);
         }
-      })
+      });
   } else {
     throw new Error("sortDirection must be either 'asc' or 'desc'.");
   }
@@ -301,17 +308,19 @@ function filterBySearchTerm(agGridElement, options) {
   }
 
   if (operator) {
-    const elem = cy.get(agGridElement)
+    const elem = cy
+      .get(agGridElement)
       .find(".ag-filter")
       .find(".ag-picker-field-wrapper")
       .filter(":visible")
-      .eq(searchInputIndex)
-    cy.get(agGridElement).agGridWaitForAnimation()
-    elem.click()
+      .eq(searchInputIndex);
+    cy.get(agGridElement).agGridWaitForAnimation();
+    elem.click();
     cy.get(agGridElement)
       .find(".ag-popup .ag-list")
       .find("span")
-      .contains(operator).click()
+      .contains(operator)
+      .click();
   }
   // Input filter term and allow grid a moment to render the results
   cy.get(agGridElement)
@@ -332,7 +341,7 @@ function filterBySearchTerm(agGridElement, options) {
     operator !== filterOperator.notBlank
   ) {
     cy.get("@filterInput").then(($ele) => {
-      cy.wrap($ele).eq(searchInputIndex).clear().type(filterValue)
+      cy.wrap($ele).eq(searchInputIndex).clear().type(filterValue);
     });
   }
 
@@ -347,10 +356,10 @@ function applyColumnFilter(agGridElement, hasApplyButton, noMenuTabs) {
     cy.get(agGridElement)
       .find(".ag-filter-apply-panel-button")
       .contains("Apply")
-      .click()
+      .click();
   }
   if (!noMenuTabs) {
-    getMenuTabElement(agGridElement, filterTab.filter).click()
+    getMenuTabElement(agGridElement, filterTab.filter).click();
   }
 }
 
@@ -375,8 +384,8 @@ function toggleColumnCheckboxFilter(
     .siblings("div")
     .find("input")
     .then(($ele) => {
-      if (doSelect) cy.wrap($ele).check()
-      else cy.wrap($ele).uncheck()
+      if (doSelect) cy.wrap($ele).check();
+      else cy.wrap($ele).uncheck();
     });
 }
 
@@ -596,7 +605,7 @@ export function toggleColumnFromSideBar(agGridElement, columnName, doRemove) {
       if (!$columnFilterInputField.is(":visible")) {
         cy.get(".ag-side-buttons").find("span").contains("Columns").click();
       }
-      cy.get(agGridElement).agGridWaitForAnimation()
+      cy.get(agGridElement).agGridWaitForAnimation();
       cy.wrap($columnFilterInputField).clear().type(columnName);
       cy.get(".ag-column-select-column-label")
         .contains(columnName)
