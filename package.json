@@ -24,6 +24,10 @@
   "author": "Kerry McKeever <kerry@kerrymckeever.com>",
   "license": "MIT",
   "devDependencies": {
-    "cypress": "^13.3.0"
+    "cypress": "^13.3.0",
+    "mocha": "^10.4.0"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.4"
   }
 }
