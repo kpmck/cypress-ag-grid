@@ -1,18 +1,20 @@
 // specify the columns
-const columnDefs = [
-  { field: "year", pinned: "left" },
-  { field: "make", rowGroup: false, pinned: "left" },
-  { field: "model", filter: true },
-  { field: "condition",filter: "agTextColumnFilter", filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: 'OR', } },
-  {
-    field: "price",
-    pinned: "right",
-    floatingFilter: false,
-    sortable: false,
-    editable: true,
-    cellEditor: "agTextCellEditor",
-  },
-];
+function getColumnDefs(floatingFilter) {
+  return [
+    { field: "year", pinned: "left", floatingFilter },
+    { field: "make", rowGroup: false, pinned: "left", floatingFilter },
+    { field: "model", filter: true, floatingFilter },
+    { field: "condition", filter: "agTextColumnFilter", floatingFilter, filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: 'OR', } },
+    {
+      field: "price",
+      pinned: "right",
+      floatingFilter: false,
+      sortable: false,
+      editable: true,
+      cellEditor: "agTextCellEditor",
+    },
+  ];
+}
 
 const autoGroupColumnDef = {
   headerName: "Model",
@@ -38,16 +40,21 @@ const gridOptions = {
   },
   autoGroupColumnDef: autoGroupColumnDef,
   groupSelectsChildren: true,
-  columnDefs: columnDefs,
+  columnDefs: getColumnDefs(true),
   rowSelection: "multiple",
   domLayout: "normal",
   pagination: true,
+  paginationPageSizeSelector: [5, 10, 20],
   paginationPageSize: 5,
   sideBar: true,
 };
 
 // lookup the container we want the Grid to use
 const eGridDiv = document.querySelector("#myGrid");
+
+function MakeFloating(floating) {
+  gridOptions.api.setGridOption('columnDefs', getColumnDefs(floating));
+}
 
 // create the grid passing in the div to use together with the columns &amp; data we want to use
 new agGrid.Grid(eGridDiv, gridOptions);
@@ -61,7 +68,7 @@ fetch("./data.json")
 
 function autoSizeAllColumns() {
   var allColumnIds = [];
-  gridOptions.api.getAllColumns().forEach(function (column) {
+  gridOptions.api.getColumns().forEach(function (column) {
     allColumnIds.push(column.colId);
   });
   gridOptions.api.autoSizeColumns(allColumnIds);

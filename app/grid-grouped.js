@@ -3,7 +3,7 @@ const columnDefsGrouped = [
   { field: "year", pivot: true, },
   { field: "make", rowGroup: true, enableRowGroup: true },
   { field: "model", filter: true },
-  { field: "price", editable: true, cellEditor: 'agTextCellEditor'  },
+  { field: "price", editable: true, cellEditor: 'agTextCellEditor' },
 ];
 
 const autoGroupColumnDefGrouped = {
@@ -54,7 +54,7 @@ fetch("./data.json")
 
 function autoSizeAllColumns() {
   var allColumnIds = [];
-  gridOptionsGrouped.api.getAllColumns().forEach(function (column) {
+  gridOptionsGrouped.api.getColumns().forEach(function (column) {
     allColumnIds.push(column.colId);
   });
   gridOptionsGrouped.api.autoSizeColumns(allColumnIds);
@@ -64,6 +64,6 @@ function autoSizeAllColumns() {
 if (window.Cypress) {
   gridOptionsGrouped.api.sizeColumnsToFit();
 } else {
-    // Otherwise auto-size columns the way we wish to view the grid in production.
-    autoSizeAllColumns();
+  // Otherwise auto-size columns the way we wish to view the grid in production.
+  autoSizeAllColumns();
 }

@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <script src="https://unpkg.com/ag-grid-enterprise/dist/ag-grid-enterprise.min.noStyle.js"></script>
   <link rel="stylesheet" href="./ag-grid.css">
   <link rel="stylesheet" href="./ag-theme-alpine.css">
 </head>
+
 <body>
   <div id="myGrid" style="height: 600px;width:900px;" class="ag-theme-alpine" sideBar="true"></div>
   <script src="grid-basic.js" type="text/javascript" charset="utf-8"></script>
-
+  <button onclick="MakeFloating(true)" id="floating">Floating</button>
+  <button onclick="MakeFloating(false)" id="nonFloating">Non Floating</button>
   <div id="myGrid2" style="height: 600px;width:900px;" class="ag-theme-alpine" sideBar="true"></div>
   <script src="grid-grouped.js" type="text/javascript" charset="utf-8"></script>
 </body>
+
 </html>

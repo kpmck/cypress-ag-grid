@@ -244,16 +244,22 @@ function getMenuTabElement(agGridElement, tab) {
  * @param tab
  */
 function selectMenuTab(agGridElement, tab) {
-  getMenuTabElement(agGridElement, tab).then(($ele) => {
-    cy.wrap($ele)
-      .parent("span")
-      .invoke("attr", "class")
-      .then(($attr) => {
-        if (!$attr.includes("selected")) {
-          cy.wrap($ele).click();
-        }
+  cy.get(agGridElement).then((agGr) => {
+    if (agGr.find('.ag-menu-list').length > 0) {
+      cy.log('Menu uses a list, not tabs');
+    } else {
+      getMenuTabElement(agGridElement, tab).then(($ele) => {
+        cy.wrap($ele)
+          .parent("span")
+          .invoke("attr", "class")
+          .then(($attr) => {
+            if (!$attr.includes("selected")) {
+              cy.wrap($ele).click();
+            }
+          });
       });
-  });
+    }
+  })
 }
 
 /**
@@ -286,7 +292,7 @@ function getFilterColumnButtonElement(
   else
     return getColumnHeaderElement(agGridElement, columnName)
       .parent()
-      .siblings(".ag-header-cell-menu-button");
+      .siblings(".ag-header-cell-filter-button");
 }
 
 /**
@@ -303,9 +309,9 @@ function filterBySearchTerm(agGridElement, options) {
   const noMenuTabs = options.noMenuTabs;
 
   // Navigate to the filter tab
-  if (!noMenuTabs) {
-    selectMenuTab(agGridElement, filterTab.filter);
-  }
+  // if (!noMenuTabs) {
+  //   selectMenuTab(agGridElement, filterTab.filter);
+  // }
 
   if (operator) {
     const elem = cy
@@ -331,7 +337,7 @@ function filterBySearchTerm(agGridElement, options) {
 
   // If it's a multi filter, de-select the 'select-all' checkbox
   if (isMultiFilter) {
-    const selectAllText = options.selectAllLocaleText || "Select All";
+    const selectAllText = options.selectAllLocaleText || "(Select All)";
     toggleColumnCheckboxFilter(agGridElement, selectAllText, false, true);
   }
 
@@ -341,7 +347,7 @@ function filterBySearchTerm(agGridElement, options) {
     operator !== filterOperator.notBlank
   ) {
     cy.get("@filterInput").then(($ele) => {
-      cy.wrap($ele).eq(searchInputIndex).clear().type(filterValue);
+      cy.wrap($ele).eq(searchInputIndex).clear().type(filterValue + '{enter}');
     });
   }
 
@@ -359,7 +365,14 @@ function applyColumnFilter(agGridElement, hasApplyButton, noMenuTabs) {
       .click();
   }
   if (!noMenuTabs) {
-    getMenuTabElement(agGridElement, filterTab.filter).click();
+    cy.get(agGridElement).then((agGr) => {
+      if (agGr.find('.ag-tab').length === 0) {
+        cy.log('Menu uses a list, not tabs');
+        cy.get(agGridElement).agGridWaitForAnimation();
+      } else {
+        getMenuTabElement(agGridElement, filterTab.filter).click();
+      }
+    })
   }
 }
 
@@ -375,9 +388,9 @@ function toggleColumnCheckboxFilter(
   doSelect,
   noMenuTabs = false
 ) {
-  if (!noMenuTabs) {
-    selectMenuTab(agGridElement, filterTab.filter);
-  }
+  // if (!noMenuTabs) {
+  //   selectMenuTab(agGridElement, filterTab.filter);
+  // }
   cy.get(agGridElement)
     .find(".ag-input-field-label")
     .contains(filterValue)
@@ -393,7 +406,7 @@ function populateSearchCriteria(
   searchCriteria,
   hasApplyButton = false,
   noMenuTabs = false,
-  selectAllLocaleText = "Select All"
+  selectAllLocaleText = "(Select All)"
 ) {
   const options = {};
   options.searchCriteria = { ...searchCriteria };
@@ -487,7 +500,7 @@ function _filterBySearchTextColumnMenu(agGridElement, options) {
  * @param options.searchCriteria.operator [Optional] Use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values).
  * @param options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
  * @param options.noMenuTabs [Optional] True if you use, for example, the community edition of ag-grid, which has no menu tabs
- * @param options.selectAllLocaleText [Optional] Pass in the locale text value of "Select All" for when you are filtering by checkbox - this wil first deselect the "Select All" option before selecting your filter value
+ * @param options.selectAllLocaleText [Optional] Pass in the locale text value of "(Select All)" for when you are filtering by checkbox - this wil first deselect the "(Select All)" option before selecting your filter value
  */
 export function filterBySearchTextColumnFloatingFilter(agGridElement, options) {
   // Check if there are multiple search criteria provided by attempting to access the columnName
@@ -554,7 +567,7 @@ function _filterByCheckboxColumnMenu(agGridElement, options) {
       agGridElement,
       options.searchCriteria.columnName
     ).click();
-    const selectAllText = options.selectAllLocaleText || "Select All";
+    const selectAllText = options.selectAllLocaleText || "(Select All)";
     toggleColumnCheckboxFilter(
       agGridElement,
       selectAllText,

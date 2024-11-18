@@ -44,6 +44,7 @@ describe("ag-grid get data scenarios", () => {
   beforeEach(() => {
     cy.visit("../app/index.html");
     cy.get(".ag-cell", { timeout: 10000 }).should("be.visible");
+    cy.get('#floating').click()
   });
 
   it("verify paginated table data - any order - include all columns", () => {
@@ -113,13 +114,14 @@ describe("ag-grid get data scenarios", () => {
     const expectedTableData = [
       { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", Price: "88001" },
     ];
-    cy.get(agGridSelector).agGridColumnFilterCheckboxMenu({
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
       searchCriteria: {
         columnName: "Model",
         filterValue: "2002",
       },
-      selectAllLocaleText: "Select All", // This is optional if you are using localText for ag grid
+      selectAllLocaleText: "(Select All)", // This is optional if you are using localText for ag grid
       hasApplyButton: true,
+
     });
     cy.get(agGridSelector)
       .getAgGridData()
@@ -129,6 +131,7 @@ describe("ag-grid get data scenarios", () => {
   });
 
   it("able to filter by checkbox - multiple columns", () => {
+    cy.get('#nonFloating').click()
     const expectedTableData = [
       { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", Price: "45000" },
       { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", Price: "32000" },
@@ -182,6 +185,7 @@ describe("ag-grid get data scenarios", () => {
   });
 
   it("able to filter by text - menu - multiple columns", () => {
+    cy.get('#nonFloating').click()
     const expectedTableData = [
       { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", Price: "32000" },
     ];
