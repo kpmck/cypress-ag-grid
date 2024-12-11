@@ -474,6 +474,43 @@ describe("ag-grid get data scenarios", () => {
 
   });
 
+  it("able to filter by 'Not blank'", () => {
+    const expectedTableData = [
+      { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "fair", Price: "35000" },
+      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "excellent", Price: "32000" },
+      { Year: "2020", Make: "Porsche", Model: "Boxter", Condition: "good", Price: "72000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", Price: "45000" },
+      { Year: "2020", Make: "Mercedes", Model: "GLC300", Condition: "good", Price: "53000" },
+      { Year: "2020", Make: "Honda", Model: "Civic", Condition: "poor", Price: "22000" },
+      { Year: "2020", Make: "Honda", Model: "Accord", Condition: "poor", Price: "32000" },
+      { Year: "2020", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "19000" },
+      { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "good", Price: "22000" },
+      { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "poor", Price: "5000" },
+      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "good", Price: "25000" },
+      { Year: "2020", Make: "Porsche", Model: "Boxter", Condition: "good", Price: "99000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", Price: "32000" },
+      { Year: "2020", Make: "Mercedes", Model: "GLC300", Condition: "excellent", Price: "35000" },
+      { Year: "2011", Make: "Honda", Model: "Civic", Condition: "good", Price: "9000" },
+      { Year: "2020", Make: "Honda", Model: "Accord", Condition: "good", Price: "34000" },
+      { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "900" },
+      { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "fair", Price: "3000" },
+      { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", Price: "88001" }
+    ]
+
+    cy.get(agGridSelector).agGridColumnFilterTextMenu({
+      searchCriteria: {
+        columnName: "Price",
+        operator: filterOperator.notBlank,
+      },
+      hasApplyButton: true,
+    });
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        cy.agGridValidateRowsSubset(actualTableData, expectedTableData);
+      });
+  });
+
   it('able to filter by agTextColumnFilter with join operator', () => {
     const expectedTableData = [
       { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "fair", Price: "35000" },
