@@ -329,11 +329,16 @@ function filterBySearchTerm(agGridElement, options) {
       .click();
   }
   // Input filter term and allow grid a moment to render the results
-  cy.get(agGridElement)
-    .find(".ag-popup-child")
-    .find("input")
-    .filter(":visible")
-    .as("filterInput");
+  if (
+    operator !== filterOperator.blank &&
+    operator !== filterOperator.notBlank
+  ) {
+    cy.get(agGridElement)
+      .find(".ag-popup-child")
+      .find("input")
+      .filter(":visible")
+      .as("filterInput");
+  }
 
   // If it's a multi filter, de-select the 'select-all' checkbox
   if (isMultiFilter) {

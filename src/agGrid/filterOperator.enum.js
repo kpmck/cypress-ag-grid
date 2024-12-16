@@ -11,5 +11,5 @@ export const filterOperator = {
   greaterThanOrEquals: "Greater than or equal to",
   inRange: "Between",
   blank: "Blank",
-  notBlank: "Not Blank"
+  notBlank: "Not blank"
 }
