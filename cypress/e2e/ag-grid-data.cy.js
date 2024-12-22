@@ -497,6 +497,8 @@ describe("ag-grid get data scenarios", () => {
       { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", Price: "88001" }
     ]
 
+    cy.get('.ag-picker-field-display').eq(0).type('{downArrow}{downArrow}{downArrow}{enter}')
+
     cy.get(agGridSelector).agGridColumnFilterTextMenu({
       searchCriteria: {
         columnName: "Price",
