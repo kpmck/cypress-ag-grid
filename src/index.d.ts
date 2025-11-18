@@ -97,6 +97,7 @@ interface agGridColumnFilterOptions<TSearchCriteria> {
   hasApplyButton?: boolean,
   selectAllLocaleText?: string,
   noMenuTabs?: boolean,
+  searchInputIsDate?: boolean;
 }
 
 
@@ -122,4 +123,5 @@ interface agGridColumnFilterSearchCriteriaOptionsWithOperator extends agGridColu
 interface agGridColumnFilterSearchCriteriaOptionsWithMultiFilter extends agGridColumnFilterSearchCriteriaOptionsWithOperator {
   /** Use if floating filter is multiselect checkboxes vs free form input */
   isMultiFilter?: boolean
+
 }
