@@ -307,7 +307,7 @@ function filterBySearchTerm(agGridElement, options) {
   const searchInputIndex = options.searchCriteria.searchInputIndex || 0;
   const isMultiFilter = options.searchCriteria.isMultiFilter;
   const noMenuTabs = options.noMenuTabs;
-  const searchInputIsDate = options.searchCriteria.searchInputIsDate;
+  const searchInputIsDate = options.searchInputIsDate;
 
   // Navigate to the filter tab
   // if (!noMenuTabs) {
