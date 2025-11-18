@@ -13,7 +13,8 @@ Cypress plugin for interacting with and validating against ag grid.
     + [Grid Filtering](#)
         - [Filter Options](#filter-options)
         - [Filter by Text - Column Menu](#filter-by-text---column-menu)
-        - [Filterby Text - Floating Filter](#filterby-text---floating-filter)
+        - [Filter by Text - Floating Filter](#filterby-text---floating-filter)
+        - [Filter by Date - Floating Filter](#filterby-date---floating-filter)
         - [Filter by Checkbox - Column Menu](#filter-by-checkbox---column-menu)
         - [Filtering - Localization and Internationalization](#filtering---localization-and-internationalization)
         - [Add or Remove Columns](#add-or-remove-columns)
@@ -150,6 +151,7 @@ options: {
         filterValue: string;
         operator?: string;
         isMultiFilter?: boolean;
+        searchInputIsDate?: boolean;
     }];
     hasApplyButton?: boolean;
     noMenuTabs?: boolean;
@@ -163,6 +165,7 @@ options: {
 - options.searchCriteria.searchInputIndex [Optional] Uses 0 by default. Index of which filter box to use in event of having multiple search conditionals
 - options.searchCriteria.operator [Optional] Use if using a search operator (i.e. Less Than, Equals, etc...use filterOperator.enum values).
 - options.searchCriteria.isMultiFilter [Optional] Used when floating filter menu has checkbox options vs freeform text input.
+- options.searchCriteria.searchInputIsDate [Optional] Set to true when filtering date columns. When true, filterValue should be in ISO format (YYYY-MM-DD).
 - options.hasApplyButton [Optional] True if "Apply" button is used, false if filters by text input automatically.
 - options.noMenuTabs [Optional] True if you use, for example, the community edition of ag-grid, which has no menu tabs
 - options.selectAllLocaleText [Optional] Pass in the locale text value of "Select All" for when you are filtering by checkbox - this will first deselect the "Select All" option before selecting your filter value
@@ -238,6 +241,29 @@ Example:
     });
 ```
 ![alt text](./ag-grid-example-filter-text-floating-multi-condition.png "AG Grid Dom - Filter by Text Floating")
+
+<br/>
+</br>
+
+### Filter by Date - Floating Filter
+This command will filter a date column by a date value from its floating filter. When filtering date columns, set `searchInputIsDate` to `true` and provide the `filterValue` in ISO format (YYYY-MM-DD).
+
+<b>Definition:</b> .agGridColumnFilterTextFloating(options: {})
+
+Example:
+```javascript
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: {
+        columnName: "Purchase Date",
+        operator: filterOperator.equals,
+        filterValue: "2020-01-15",
+        searchInputIsDate: true,
+      },
+      hasApplyButton: true,
+    });
+```
+
+The above example will filter the Purchase Date column for the date `2020-01-15` (January 15, 2020) using the "Equals" operator. Note that the `filterValue` must be in ISO format (YYYY-MM-DD), while the grid will display dates in the localized format (e.g., "1/15/2020" for US locale).
 
 <br/>
 </br>

@@ -307,6 +307,7 @@ function filterBySearchTerm(agGridElement, options) {
   const searchInputIndex = options.searchCriteria.searchInputIndex || 0;
   const isMultiFilter = options.searchCriteria.isMultiFilter;
   const noMenuTabs = options.noMenuTabs;
+  const searchInputIsDate = options.searchCriteria.searchInputIsDate;
 
   // Navigate to the filter tab
   // if (!noMenuTabs) {
@@ -352,7 +353,12 @@ function filterBySearchTerm(agGridElement, options) {
     operator !== filterOperator.notBlank
   ) {
     cy.get("@filterInput").then(($ele) => {
-      cy.wrap($ele).eq(searchInputIndex).clear().type(filterValue + '{enter}');
+      let valueToType = filterValue;
+      // Don't add {enter} to the input text if it's a date
+      if (!searchInputIsDate) {
+        valueToType += "{enter}";
+      }
+      cy.wrap($ele).eq(searchInputIndex).clear().type(valueToType);
     });
   }
 
