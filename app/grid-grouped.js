@@ -4,6 +4,35 @@ const columnDefsGrouped = [
   { field: "make", rowGroup: true, enableRowGroup: true },
   { field: "model", filter: true },
   { field: "price", editable: true, cellEditor: 'agTextCellEditor' },
+  {
+    field: "purchaseDate",
+    filter: "agDateColumnFilter",
+    floatingFilter: true,
+    filterParams: {
+      buttons: ["reset", "apply"],
+      comparator: (filterLocalDateAtMidnight, cellValue) => {
+        const dateAsString = cellValue;
+        if (dateAsString == null) return -1;
+        const dateParts = dateAsString.split("-");
+        const cellDate = new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2]));
+        if (cellDate < filterLocalDateAtMidnight) {
+          return -1;
+        } else if (cellDate > filterLocalDateAtMidnight) {
+          return 1;
+        } else {
+          return 0;
+        }
+      },
+    },
+    valueFormatter: (params) => {
+      if (params.value) {
+        const dateParts = params.value.split("-");
+        const date = new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2]));
+        return date.toLocaleDateString();
+      }
+      return "";
+    },
+  },
 ];
 
 const autoGroupColumnDefGrouped = {
