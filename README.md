@@ -257,8 +257,8 @@ Example:
         columnName: "Purchase Date",
         operator: filterOperator.equals,
         filterValue: "2020-01-15",
-        searchInputIsDate: true,
       },
+      searchInputIsDate: true,
       hasApplyButton: true,
     });
 ```
