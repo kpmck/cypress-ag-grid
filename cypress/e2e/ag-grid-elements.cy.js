@@ -21,8 +21,8 @@ describe("ag-grid get elements scenario", () => {
 
     // expected values before changing the price
     const expectedTableBeforeEditing = [
-      { Year: "2020", Make: "Porsche", Model: "Boxter", Price: "72000" },
-      { Year: "2020", Make: "Porsche", Model: "Boxter", Price: "99000" },
+      { Year: "2020", Make: "Porsche", Model: "Boxter", "Purchase Date": "3/10/2020", Price: "72000" },
+      { Year: "2020", Make: "Porsche", Model: "Boxter", "Purchase Date": "12/3/2020", Price: "99000" },
     ];
 
     // verify values before editing
@@ -45,8 +45,8 @@ describe("ag-grid get elements scenario", () => {
 
     // expected values after changing the price
     const expectedTableAfterEditing = [
-      { Year: "2020", Make: "Porsche", Model: "Boxter", Price: "66000" },
-      { Year: "2020", Make: "Porsche", Model: "Boxter", Price: "99000" },
+      { Year: "2020", Make: "Porsche", Model: "Boxter", "Purchase Date": "3/10/2020", Price: "66000" },
+      { Year: "2020", Make: "Porsche", Model: "Boxter", "Purchase Date": "12/3/2020", Price: "99000" },
     ];
 
     // verify values before editing

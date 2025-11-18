@@ -11,32 +11,32 @@ const _pageSize = 5;
 const agGridSelector = "#myGrid";
 const expectedPaginatedTableData = [
   [
-    { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "fair", Price: "35000" },
-    { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "excellent", Price: "32000" },
-    { Year: "2020", Make: "Porsche", Model: "Boxter", Condition: "good", Price: "72000" },
-    { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", Price: "45000" },
-    { Year: "2020", Make: "Mercedes", Model: "GLC300", Condition: "good", Price: "53000" },
+    { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "fair", "Purchase Date": "1/15/2020", Price: "35000" },
+    { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "excellent", "Purchase Date": "2/20/2020", Price: "32000" },
+    { Year: "2020", Make: "Porsche", Model: "Boxter", Condition: "good", "Purchase Date": "3/10/2020", Price: "72000" },
+    { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", "Purchase Date": "4/5/2020", Price: "45000" },
+    { Year: "2020", Make: "Mercedes", Model: "GLC300", Condition: "good", "Purchase Date": "5/22/2020", Price: "53000" },
   ],
   [
-    { Year: "2020", Make: "Honda", Model: "Civic", Condition: "poor", Price: "22000" },
-    { Year: "2020", Make: "Honda", Model: "Accord", Condition: "poor", Price: "32000" },
-    { Year: "2020", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "19000" },
-    { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "good", Price: "22000" },
-    { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "poor", Price: "5000" },
+    { Year: "2020", Make: "Honda", Model: "Civic", Condition: "poor", "Purchase Date": "6/18/2020", Price: "22000" },
+    { Year: "2020", Make: "Honda", Model: "Accord", Condition: "poor", "Purchase Date": "7/12/2020", Price: "32000" },
+    { Year: "2020", Make: "Ford", Model: "Taurus", Condition: "excellent", "Purchase Date": "8/30/2020", Price: "19000" },
+    { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "good", "Purchase Date": "9/14/2020", Price: "22000" },
+    { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "poor", "Purchase Date": "10/8/2020", Price: "5000" },
   ],
   [
-    { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "good", Price: "25000" },
-    { Year: "2020", Make: "Porsche", Model: "Boxter", Condition: "good", Price: "99000" },
-    { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", Price: "32000" },
-    { Year: "2020", Make: "Mercedes", Model: "GLC300", Condition: "excellent", Price: "35000" },
-    { Year: "2011", Make: "Honda", Model: "Civic", Condition: "good", Price: "9000" },
+    { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "good", "Purchase Date": "11/25/2020", Price: "25000" },
+    { Year: "2020", Make: "Porsche", Model: "Boxter", Condition: "good", "Purchase Date": "12/3/2020", Price: "99000" },
+    { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", "Purchase Date": "1/19/2021", Price: "32000" },
+    { Year: "2020", Make: "Mercedes", Model: "GLC300", Condition: "excellent", "Purchase Date": "2/11/2021", Price: "35000" },
+    { Year: "2011", Make: "Honda", Model: "Civic", Condition: "good", "Purchase Date": "6/5/2011", Price: "9000" },
   ],
   [
-    { Year: "2020", Make: "Honda", Model: "Accord", Condition: "good", Price: "34000" },
-    { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "900" },
-    { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "fair", Price: "3000" },
-    { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", Price: "88001" },
-    { Year: "2023", Make: "Hyundai", Model: "Santa Fe", Condition: "excellent", Price: "" },
+    { Year: "2020", Make: "Honda", Model: "Accord", Condition: "good", "Purchase Date": "3/28/2021", Price: "34000" },
+    { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", "Purchase Date": "9/15/1990", Price: "900" },
+    { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "fair", "Purchase Date": "4/16/2021", Price: "3000" },
+    { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", "Purchase Date": "5/7/2021", Price: "88001" },
+    { Year: "2023", Make: "Hyundai", Model: "Santa Fe", Condition: "excellent", "Purchase Date": "8/20/2023", Price: "" },
   ],
 ];
 
@@ -112,7 +112,7 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by checkbox", () => {
     const expectedTableData = [
-      { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", Price: "88001" },
+      { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", "Purchase Date": "5/7/2021", Price: "88001" },
     ];
     cy.get(agGridSelector).agGridColumnFilterTextFloating({
       searchCriteria: {
@@ -133,9 +133,9 @@ describe("ag-grid get data scenarios", () => {
   it("able to filter by checkbox - multiple columns", () => {
     cy.get('#nonFloating').click()
     const expectedTableData = [
-      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", Price: "45000" },
-      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", Price: "32000" },
-      { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", Price: "88001" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", "Purchase Date": "4/5/2020", Price: "45000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", "Purchase Date": "1/19/2021", Price: "32000" },
+      { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", "Purchase Date": "5/7/2021", Price: "88001" },
     ];
 
     cy.get(agGridSelector).agGridColumnFilterCheckboxMenu({
@@ -164,9 +164,9 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by text - menu", () => {
     const expectedTableData = [
-      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", Price: "32000" },
-      { Year: "2020", Make: "Honda", Model: "Accord", Condition: "poor", Price: "32000" },
-      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "excellent", Price: "32000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", "Purchase Date": "1/19/2021", Price: "32000" },
+      { Year: "2020", Make: "Honda", Model: "Accord", Condition: "poor", "Purchase Date": "7/12/2020", Price: "32000" },
+      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "excellent", "Purchase Date": "2/20/2020", Price: "32000" },
     ];
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
     cy.get(agGridSelector).agGridColumnFilterTextMenu({
@@ -187,7 +187,7 @@ describe("ag-grid get data scenarios", () => {
   it("able to filter by text - menu - multiple columns", () => {
     cy.get('#nonFloating').click()
     const expectedTableData = [
-      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", Price: "32000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", "Purchase Date": "1/19/2021", Price: "32000" },
     ];
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
     cy.get(agGridSelector).agGridColumnFilterTextMenu({
@@ -214,10 +214,10 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by text - floating filter", () => {
     const expectedTableData = [
-      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "excellent", Price: "32000" },
-      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "good", Price: "25000" },
-      { Year: "2020", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "19000" },
-      { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "900" },
+      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "excellent", "Purchase Date": "2/20/2020", Price: "32000" },
+      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "good", "Purchase Date": "11/25/2020", Price: "25000" },
+      { Year: "2020", Make: "Ford", Model: "Taurus", Condition: "excellent", "Purchase Date": "8/30/2020", Price: "19000" },
+      { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", "Purchase Date": "9/15/1990", Price: "900" },
     ];
 
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
@@ -237,9 +237,9 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by text - floating filter - multiple conditions", () => {
     const expectedTableData = [
-      { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", Price: "88001" },
-      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", Price: "45000" },
-      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", Price: "32000" },
+      { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", "Purchase Date": "5/7/2021", Price: "88001" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", "Purchase Date": "4/5/2020", Price: "45000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", "Purchase Date": "1/19/2021", Price: "32000" },
     ];
 
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
@@ -268,7 +268,7 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by text - floating filter - multiple columns", () => {
     const expectedTableData = [
-      { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "900" },
+      { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", "Purchase Date": "9/15/1990", Price: "900" },
     ];
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
     cy.get(agGridSelector).agGridColumnFilterTextFloating({
@@ -296,8 +296,8 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by text - floating filter - multi filter", () => {
     const expectedTableData = [
-      { Year: "2020", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "19000" },
-      { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "900" },
+      { Year: "2020", Make: "Ford", Model: "Taurus", Condition: "excellent", "Purchase Date": "8/30/2020", Price: "19000" },
+      { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", "Purchase Date": "9/15/1990", Price: "900" },
     ];
     cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
     cy.get(agGridSelector).agGridColumnFilterTextFloating({
@@ -456,8 +456,8 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by 'Blank'", () => {
     const expectedTableData = [
-      { Year: "2023", Make: "Hyundai", Model: "Santa Fe", Condition: "excellent", Price: "" }
-    ]
+      { Year: "2023", Make: "Hyundai", Model: "Santa Fe", Condition: "excellent", "Purchase Date": "8/20/2023", Price: "" },
+    ];
 
     cy.get(agGridSelector).agGridColumnFilterTextMenu({
       searchCriteria: {
@@ -476,26 +476,26 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by 'Not blank'", () => {
     const expectedTableData = [
-      { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "fair", Price: "35000" },
-      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "excellent", Price: "32000" },
-      { Year: "2020", Make: "Porsche", Model: "Boxter", Condition: "good", Price: "72000" },
-      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", Price: "45000" },
-      { Year: "2020", Make: "Mercedes", Model: "GLC300", Condition: "good", Price: "53000" },
-      { Year: "2020", Make: "Honda", Model: "Civic", Condition: "poor", Price: "22000" },
-      { Year: "2020", Make: "Honda", Model: "Accord", Condition: "poor", Price: "32000" },
-      { Year: "2020", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "19000" },
-      { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "good", Price: "22000" },
-      { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "poor", Price: "5000" },
-      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "good", Price: "25000" },
-      { Year: "2020", Make: "Porsche", Model: "Boxter", Condition: "good", Price: "99000" },
-      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", Price: "32000" },
-      { Year: "2020", Make: "Mercedes", Model: "GLC300", Condition: "excellent", Price: "35000" },
-      { Year: "2011", Make: "Honda", Model: "Civic", Condition: "good", Price: "9000" },
-      { Year: "2020", Make: "Honda", Model: "Accord", Condition: "good", Price: "34000" },
-      { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "900" },
-      { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "fair", Price: "3000" },
-      { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", Price: "88001" }
-    ]
+      { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "fair", "Purchase Date": "1/15/2020", Price: "35000" },
+      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "excellent", "Purchase Date": "2/20/2020", Price: "32000" },
+      { Year: "2020", Make: "Porsche", Model: "Boxter", Condition: "good", "Purchase Date": "3/10/2020", Price: "72000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", "Purchase Date": "4/5/2020", Price: "45000" },
+      { Year: "2020", Make: "Mercedes", Model: "GLC300", Condition: "good", "Purchase Date": "5/22/2020", Price: "53000" },
+      { Year: "2020", Make: "Honda", Model: "Civic", Condition: "poor", "Purchase Date": "6/18/2020", Price: "22000" },
+      { Year: "2020", Make: "Honda", Model: "Accord", Condition: "poor", "Purchase Date": "7/12/2020", Price: "32000" },
+      { Year: "2020", Make: "Ford", Model: "Taurus", Condition: "excellent", "Purchase Date": "8/30/2020", Price: "19000" },
+      { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "good", "Purchase Date": "9/14/2020", Price: "22000" },
+      { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "poor", "Purchase Date": "10/8/2020", Price: "5000" },
+      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "good", "Purchase Date": "11/25/2020", Price: "25000" },
+      { Year: "2020", Make: "Porsche", Model: "Boxter", Condition: "good", "Purchase Date": "12/3/2020", Price: "99000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "poor", "Purchase Date": "1/19/2021", Price: "32000" },
+      { Year: "2020", Make: "Mercedes", Model: "GLC300", Condition: "excellent", "Purchase Date": "2/11/2021", Price: "35000" },
+      { Year: "2011", Make: "Honda", Model: "Civic", Condition: "good", "Purchase Date": "6/5/2011", Price: "9000" },
+      { Year: "2020", Make: "Honda", Model: "Accord", Condition: "good", "Purchase Date": "3/28/2021", Price: "34000" },
+      { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", "Purchase Date": "9/15/1990", Price: "900" },
+      { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "fair", "Purchase Date": "4/16/2021", Price: "3000" },
+      { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", "Purchase Date": "5/7/2021", Price: "88001" },
+    ];
 
     cy.get('.ag-picker-field-display').eq(0).type('{downArrow}{downArrow}{downArrow}{enter}')
 
@@ -515,10 +515,10 @@ describe("ag-grid get data scenarios", () => {
 
   it('able to filter by agTextColumnFilter with join operator', () => {
     const expectedTableData = [
-      { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "fair", Price: "35000" },
-      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", Price: "45000" },
-      { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "fair", Price: "3000" },
-    ]
+      { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "fair", "Purchase Date": "1/15/2020", Price: "35000" },
+      { Year: "2020", Make: "BMW", Model: "3-series", Condition: "fair", "Purchase Date": "4/5/2020", Price: "45000" },
+      { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "fair", "Purchase Date": "4/16/2021", Price: "3000" },
+    ];
     cy.get(agGridSelector).agGridColumnFilterTextFloating({
       searchCriteria:
       {
@@ -545,6 +545,33 @@ describe("ag-grid get data scenarios", () => {
       hasApplyButton: true,
     });
 
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        cy.agGridValidateRowsSubset(actualTableData, expectedTableData);
+      });
+  });
+
+  it("able to filter by date - floating filter", () => {
+    const expectedTableData = [
+      {
+        Year: "2020",
+        Make: "Toyota",
+        Model: "Celica",
+        Condition: "fair",
+        "Purchase Date": "1/15/2020",
+        Price: "35000",
+      },
+    ];
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: {
+        columnName: "Purchase Date",
+        operator: filterOperator.equals,
+        filterValue: "2020-01-15",
+        searchInputIsDate: true,
+      },
+      hasApplyButton: true,
+    });
     cy.get(agGridSelector)
       .getAgGridData()
       .then((actualTableData) => {
