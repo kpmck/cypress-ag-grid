@@ -568,8 +568,8 @@ describe("ag-grid get data scenarios", () => {
         columnName: "Purchase Date",
         operator: filterOperator.equals,
         filterValue: "2020-01-15",
-        searchInputIsDate: true,
       },
+      searchInputIsDate: true,
       hasApplyButton: true,
     });
     cy.get(agGridSelector)
