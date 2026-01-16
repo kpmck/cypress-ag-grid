@@ -263,59 +263,37 @@ function selectMenuTab(agGridElement, tab) {
 }
 
 /**
- * Returns the filter button element for a specified column.
- *
- * @param {string|JQuery} agGridElement  The grid selector passed to cy.get()
- * @param {string} columnName            The header text of the column you want to filter
- * @param {boolean} isFloatingFilter     When true, return the button in the floating‑filter row
- * @returns {Cypress.Chainable}          A chainable yielding the filter button element
+ * Returns the filter button element for a specified column
+ * @param columnName
  */
 function getFilterColumnButtonElement(
   agGridElement,
   columnName,
   isFloatingFilter = false
 ) {
-  if (isFloatingFilter) {
+  let columnIndex;
+  if (isFloatingFilter)
     return getColumnHeaderElement(agGridElement, columnName)
-      .parents('.ag-header-cell')
-      .then(($cell) => {
-        const colIndex = $cell.attr('aria-colindex');
-
-        // Work within the grid element to find the filter button
-        return cy.get(agGridElement).then(($grid) => {
-          // 1. Try legacy floating-filter row (pre-v35)
-          const $filterRow = $grid.find('.ag-header-row-column-filter');
-          if ($filterRow.length) {
-            const $targetHeader = $filterRow.find(
-              `.ag-header-cell[aria-colindex=${colIndex}]`
-            );
-            const $button = $targetHeader.find('.ag-floating-filter-button');
-            if ($button.length) {
-              return cy.wrap($button);
-            }
-          }
-
-          // 2. New structure (v35+): button inside the header cell itself
-          const $buttonInHeader = $cell.find('.ag-floating-filter-button');
-          if ($buttonInHeader.length) {
-            return cy.wrap($buttonInHeader);
-          }
-
-          // 3. Fallback: search for any header cell with matching aria-colindex
-          const $fallback = $grid.find(
-            `.ag-header-cell[aria-colindex=${colIndex}] .ag-floating-filter-button`
-          );
-          return cy.wrap($fallback);
-        });
+      .parents(".ag-header-cell")
+      .then(($ele) => {
+        cy.wrap($ele)
+          .invoke("attr", "aria-colindex")
+          .then((colIndex) => {
+            columnIndex = colIndex;
+          })
+          .then(() => {
+            cy.wrap($ele)
+              .parents(".ag-header-row-column")
+              .siblings(".ag-header-row-filter")
+              .find(`.ag-header-cell[aria-colindex=${columnIndex}]`)
+              .find(".ag-floating-filter-button");
+          });
       });
-  } else {
-    // Non-floating filters use the normal filter-button sibling
+  else
     return getColumnHeaderElement(agGridElement, columnName)
       .parent()
-      .siblings('.ag-header-cell-filter-button');
-  }
+      .siblings(".ag-header-cell-filter-button");
 }
-
 
 /**
  *
