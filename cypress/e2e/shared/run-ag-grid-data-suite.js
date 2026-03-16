@@ -480,27 +480,49 @@ export function runAgGridDataSuite({ pagePath, versionLabel }) {
     it("able to filter by text - floating filter - between operator with explicit indexes", () => {
       enableMileageNumberFilter(true);
 
-      cy.get(agGridSelector).agGridColumnFilterTextFloating({
-        searchCriteria: {
-          columnName: "Mileage",
-          filterValue: "0",
-          operator: filterOperator.inRange,
-          searchInputIndex: 0,
-          operatorIndex: 0,
-        },
-        hasApplyButton: true,
-      });
+      if (versionLabel === "v33") {
+        cy.get(agGridSelector).agGridColumnFilterTextFloating({
+          searchCriteria: [
+            {
+              columnName: "Mileage",
+              filterValue: "0",
+              operator: filterOperator.inRange,
+              searchInputIndex: 0,
+              operatorIndex: 0,
+            },
+            {
+              columnName: "Mileage",
+              filterValue: "5000",
+              operator: filterOperator.inRange,
+              searchInputIndex: 1,
+              operatorIndex: 0,
+            },
+          ],
+          hasApplyButton: true,
+        });
+      } else {
+        cy.get(agGridSelector).agGridColumnFilterTextFloating({
+          searchCriteria: {
+            columnName: "Mileage",
+            filterValue: "0",
+            operator: filterOperator.inRange,
+            searchInputIndex: 0,
+            operatorIndex: 0,
+          },
+          hasApplyButton: true,
+        });
 
-      cy.get(agGridSelector).agGridColumnFilterTextFloating({
-        searchCriteria: {
-          columnName: "Mileage",
-          filterValue: "5000",
-          operator: filterOperator.inRange,
-          searchInputIndex: 1,
-          operatorIndex: 0,
-        },
-        hasApplyButton: true,
-      });
+        cy.get(agGridSelector).agGridColumnFilterTextFloating({
+          searchCriteria: {
+            columnName: "Mileage",
+            filterValue: "5000",
+            operator: filterOperator.inRange,
+            searchInputIndex: 1,
+            operatorIndex: 0,
+          },
+          hasApplyButton: true,
+        });
+      }
 
       cy.get(agGridSelector)
         .getAgGridData()
