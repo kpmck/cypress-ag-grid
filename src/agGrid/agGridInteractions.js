@@ -22,8 +22,15 @@ export const agGridWaitForAnimation = async (agGridElement) => {
 
   const animations = agGridElement.get()[0].getAnimations({ subtree: true });
 
+  // Filter out infinite animations (e.g. loading spinners) whose .finished
+  // promise never resolves per the Web Animations API spec.
+  const finiteAnimations = animations.filter((animation) => {
+    const iterations = animation.effect?.getTiming?.()?.iterations;
+    return iterations !== Infinity;
+  });
+
   await Promise.all(
-    animations.map(async (animation) => {
+    finiteAnimations.map(async (animation) => {
       try {
         await animation.finished;
       } catch (error) {
