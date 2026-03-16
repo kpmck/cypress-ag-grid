@@ -1,3 +1,7 @@
+function getRowDataUrl() {
+  return window.AG_GRID_DATA_PATH || "./data.json";
+}
+
 // specify the columns
 const columnDefsGrouped = [
   { field: "year", pivot: true, },
@@ -48,7 +52,7 @@ const gridApiGrouped = agGrid.createGrid(eGridDivGrouped, gridOptionsGrouped);
 gridOptionsGrouped.api = gridApiGrouped;
 
 // Grab the grid data from the supplied API endpoint
-fetch("./data.json")
+fetch(getRowDataUrl())
   .then(res => res.json())
   .then((data) => {
     gridOptionsGrouped.api.setGridOption('rowData', data);

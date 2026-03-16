@@ -1,3 +1,7 @@
+function getRowDataUrl() {
+  return window.AG_GRID_DATA_PATH || "./data.json";
+}
+
 // specify the columns
 function getColumnDefs(floatingFilter) {
   return [
@@ -20,6 +24,27 @@ function getColumnDefs(floatingFilter) {
       cellEditor: "agTextCellEditor",
     },
   ];
+}
+
+function isAgGridVersion35OrLater() {
+  const majorVersion = Number((window.AG_GRID_LIBRARY_VERSION || "0").split(".")[0]);
+  return majorVersion >= 35;
+}
+
+function applyColumnDefs(columnDefs) {
+  if (!gridOptions.api) {
+    return;
+  }
+
+  if (!isAgGridVersion35OrLater() && typeof gridOptions.api.setColumnDefs === "function") {
+    gridOptions.api.setColumnDefs(columnDefs);
+  } else {
+    gridOptions.api.setGridOption("columnDefs", columnDefs);
+  }
+
+  if (window.Cypress) {
+    gridOptions.api.sizeColumnsToFit();
+  }
 }
 
 const autoGroupColumnDef = {
@@ -50,16 +75,19 @@ const gridOptions = {
   rowSelection: "multiple",
   domLayout: "normal",
   pagination: true,
-  paginationPageSizeSelector: [5, 10, 20],
   paginationPageSize: 5,
   sideBar: true,
 };
+
+if (isAgGridVersion35OrLater()) {
+  gridOptions.paginationPageSizeSelector = [5, 10, 20];
+}
 
 // lookup the container we want the Grid to use
 const eGridDiv = document.querySelector("#myGrid");
 
 function MakeFloating(floating) {
-  gridOptions.api.setGridOption('columnDefs', getColumnDefs(floating));
+  applyColumnDefs(getColumnDefs(floating));
 }
 
 function setColumnFilter(field, filter, floatingFilter = true, hide) {
@@ -81,7 +109,7 @@ function setColumnFilter(field, filter, floatingFilter = true, hide) {
     return updatedColumnDef;
   });
 
-  gridOptions.api.setGridOption('columnDefs', columnDefs);
+  applyColumnDefs(columnDefs);
 }
 
 // create the grid passing in the div to use together with the columns &amp; data we want to use
@@ -90,7 +118,7 @@ const gridApi = agGrid.createGrid(eGridDiv, gridOptions);
 gridOptions.api = gridApi;
 
 // Grab the grid data from the supplied API endpoint
-fetch("./data.json")
+fetch(getRowDataUrl())
   .then(res => res.json())
   .then((data) => {
     gridOptions.api.setGridOption('rowData', data);

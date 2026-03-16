@@ -278,28 +278,54 @@ function getFilterColumnButtonElement(
   columnName,
   isFloatingFilter = false
 ) {
-  let columnIndex;
-  if (isFloatingFilter)
+  if (isFloatingFilter) {
     return getColumnHeaderElement(agGridElement, columnName)
       .parents(".ag-header-cell")
-      .then(($ele) => {
-        cy.wrap($ele)
-          .invoke("attr", "aria-colindex")
-          .then((colIndex) => {
-            columnIndex = colIndex;
-          })
-          .then(() => {
-            cy.wrap($ele)
-              .parents(".ag-header-row-column")
-              .siblings(".ag-header-row-filter")
-              .find(`.ag-header-cell[aria-colindex=${columnIndex}]`)
-              .find(".ag-floating-filter-button");
-          });
+      .then(($headerCell) => {
+        const columnIndex = $headerCell.attr("aria-colindex");
+        const visibleHeaderCells = $headerCell
+          .closest(".ag-header")
+          .find(".ag-header-row-column .ag-header-cell:visible");
+        const headerPosition = visibleHeaderCells.index($headerCell);
+
+        return cy.get(agGridElement).then(($gridElement) => {
+          const usesV35FloatingFilterRow =
+            $gridElement.find(".ag-header-row-filter").length > 0;
+
+          let floatingFilterButton;
+
+          if (usesV35FloatingFilterRow) {
+            floatingFilterButton = $gridElement.find(
+              `.ag-header-row-filter .ag-header-cell[aria-colindex="${columnIndex}"] .ag-floating-filter-button:visible`
+            );
+
+            if (!floatingFilterButton.length && headerPosition > -1) {
+              floatingFilterButton = $gridElement
+                .find(".ag-header-row-filter .ag-floating-filter-button:visible")
+                .eq(headerPosition);
+            }
+          } else {
+            floatingFilterButton = $gridElement.find(
+              `.ag-header-row-column-filter .ag-header-cell[aria-colindex="${columnIndex}"] .ag-floating-filter-button-button:visible`
+            );
+
+            if (!floatingFilterButton.length && headerPosition > -1) {
+              floatingFilterButton = $gridElement
+                .find(
+                  ".ag-header-row-column-filter .ag-floating-filter-button-button:visible"
+                )
+                .eq(headerPosition);
+            }
+          }
+
+          return cy.wrap(floatingFilterButton.first());
+        });
       });
-  else
+  } else {
     return getColumnHeaderElement(agGridElement, columnName)
       .parent()
       .siblings(".ag-header-cell-filter-button");
+  }
 }
 
 /**
