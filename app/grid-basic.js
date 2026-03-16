@@ -56,6 +56,22 @@ function MakeFloating(floating) {
   gridOptions.api.setGridOption('columnDefs', getColumnDefs(floating));
 }
 
+function setColumnFilter(field, filter, floatingFilter = true) {
+  const columnDefs = gridOptions.api.getColumnDefs().map((columnDef) => {
+    if (columnDef.field !== field) {
+      return columnDef;
+    }
+
+    return {
+      ...columnDef,
+      filter,
+      floatingFilter,
+    };
+  });
+
+  gridOptions.api.setGridOption('columnDefs', columnDefs);
+}
+
 // create the grid passing in the div to use together with the columns &amp; data we want to use
 const gridApi = agGrid.createGrid(eGridDiv, gridOptions);
 // keep backward compatibility with code that references gridOptions.api

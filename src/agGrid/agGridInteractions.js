@@ -312,6 +312,9 @@ function filterBySearchTerm(agGridElement, options) {
   const filterValue = options.searchCriteria.filterValue;
   const operator = options.searchCriteria.operator;
   const searchInputIndex = options.searchCriteria.searchInputIndex || 0;
+  const operatorIndex =
+    options.searchCriteria.operatorIndex ??
+    (operator === filterOperator.inRange ? 0 : searchInputIndex);
   const isMultiFilter = options.searchCriteria.isMultiFilter;
   const noMenuTabs = options.noMenuTabs;
 
@@ -326,7 +329,7 @@ function filterBySearchTerm(agGridElement, options) {
       .find(".ag-filter")
       .find(".ag-picker-field-wrapper")
       .filter(":visible")
-      .eq(searchInputIndex);
+      .eq(operatorIndex);
     cy.get(agGridElement).agGridWaitForAnimation();
     elem.click();
     cy.get(agGridElement)
@@ -517,17 +520,71 @@ function _filterBySearchTextColumnMenu(agGridElement, options) {
 export function filterBySearchTextColumnFloatingFilter(agGridElement, options) {
   // Check if there are multiple search criteria provided by attempting to access the columnName
   if (!options.searchCriteria.columnName) {
-    options.searchCriteria.forEach((_searchCriteria) => {
-      const _options = populateSearchCriteria(
-        _searchCriteria,
-        options.hasApplyButton,
-        options.noMenuTabs
+    groupFloatingFilterSearchCriteria(
+      normalizeFloatingFilterSearchCriteria(options.searchCriteria)
+    ).forEach((searchCriteriaGroup) => {
+      const criteriaOptions = searchCriteriaGroup.map((_searchCriteria) =>
+        populateSearchCriteria(
+          _searchCriteria,
+          options.hasApplyButton,
+          options.noMenuTabs
+        )
       );
-      _filterBySearchTextColumnFloatingFilter(agGridElement, _options);
+
+      if (criteriaOptions.length === 1) {
+        _filterBySearchTextColumnFloatingFilter(agGridElement, criteriaOptions[0]);
+        return;
+      }
+
+      _filterBySearchTextColumnFloatingFilterGroup(agGridElement, criteriaOptions);
     });
   } else {
     _filterBySearchTextColumnFloatingFilter(agGridElement, options);
   }
+}
+
+function normalizeFloatingFilterSearchCriteria(searchCriteria) {
+  const betweenInputIndexes = new Map();
+
+  return searchCriteria.map((criteria) => {
+    if (
+      criteria.operator !== filterOperator.inRange ||
+      criteria.searchInputIndex !== undefined
+    ) {
+      return criteria;
+    }
+
+    const criteriaKey = `${criteria.columnName}::${criteria.operator}`;
+    const nextInputIndex = betweenInputIndexes.get(criteriaKey) || 0;
+    betweenInputIndexes.set(criteriaKey, nextInputIndex + 1);
+
+    return {
+      ...criteria,
+      searchInputIndex: nextInputIndex,
+    };
+  });
+}
+
+function groupFloatingFilterSearchCriteria(searchCriteria) {
+  const groupedCriteria = [];
+
+  searchCriteria.forEach((criteria) => {
+    const lastGroup = groupedCriteria[groupedCriteria.length - 1];
+
+    if (
+      criteria.operator === filterOperator.inRange &&
+      lastGroup &&
+      lastGroup[0].columnName === criteria.columnName &&
+      lastGroup[0].operator === criteria.operator
+    ) {
+      lastGroup.push(criteria);
+      return;
+    }
+
+    groupedCriteria.push([criteria]);
+  });
+
+  return groupedCriteria;
 }
 
 function _filterBySearchTextColumnFloatingFilter(agGridElement, options) {
@@ -542,6 +599,37 @@ function _filterBySearchTextColumnFloatingFilter(agGridElement, options) {
       agGridElement,
       options.hasApplyButton,
       options.noMenuTabs
+    );
+  });
+}
+
+function _filterBySearchTextColumnFloatingFilterGroup(
+  agGridElement,
+  criteriaOptions
+) {
+  cy.get(agGridElement).then((agGridElement) => {
+    getFilterColumnButtonElement(
+      agGridElement,
+      criteriaOptions[0].searchCriteria.columnName,
+      true
+    ).click();
+
+    criteriaOptions.forEach((criteriaOption, index) => {
+      const searchCriteria =
+        index === 0
+          ? criteriaOption.searchCriteria
+          : { ...criteriaOption.searchCriteria, operator: undefined };
+
+      filterBySearchTerm(agGridElement, {
+        ...criteriaOption,
+        searchCriteria,
+      });
+    });
+
+    applyColumnFilter(
+      agGridElement,
+      criteriaOptions[0].hasApplyButton,
+      criteriaOptions[0].noMenuTabs
     );
   });
 }

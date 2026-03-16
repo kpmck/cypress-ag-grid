@@ -294,6 +294,52 @@ describe("ag-grid get data scenarios", () => {
       });
   });
 
+  it("able to filter by text - floating filter - between operator", () => {
+    const expectedTableData = [
+      { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "900" },
+      { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "fair", Price: "3000" },
+      { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "poor", Price: "5000" },
+      { Year: "2011", Make: "Honda", Model: "Civic", Condition: "good", Price: "9000" },
+    ];
+
+    cy.window().then((win) => {
+      win.setColumnFilter("price", "agNumberColumnFilter");
+    });
+    cy.get(".ag-cell").should("be.visible");
+
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: [
+        {
+          columnName: "Price",
+          filterValue: "0",
+          operator: filterOperator.inRange,
+        },
+        {
+          columnName: "Price",
+          filterValue: "9000",
+          operator: filterOperator.inRange,
+        },
+      ],
+      hasApplyButton: true,
+    });
+
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        const sortedActualTableData = [...actualTableData].sort(
+          (a, b) => Number(a.Price) - Number(b.Price)
+        );
+        const sortedExpectedTableData = [...expectedTableData].sort(
+          (a, b) => Number(a.Price) - Number(b.Price)
+        );
+
+        cy.agGridValidateRowsExactOrder(
+          sortedActualTableData,
+          sortedExpectedTableData
+        );
+      });
+  });
+
   it("able to filter by text - floating filter - multi filter", () => {
     const expectedTableData = [
       { Year: "2020", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "19000" },
