@@ -291,7 +291,7 @@ function getFilterColumnButtonElement(
           .then(() => {
             cy.wrap($ele)
               .parents(".ag-header-row-column")
-              .siblings(".ag-header-row-column-filter")
+              .siblings(".ag-header-row-filter")
               .find(`.ag-header-cell[aria-colindex=${columnIndex}]`)
               .find(".ag-floating-filter-button");
           });

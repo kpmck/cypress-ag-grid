@@ -57,7 +57,9 @@ function MakeFloating(floating) {
 }
 
 // create the grid passing in the div to use together with the columns &amp; data we want to use
-new agGrid.Grid(eGridDiv, gridOptions);
+const gridApi = agGrid.createGrid(eGridDiv, gridOptions);
+// keep backward compatibility with code that references gridOptions.api
+gridOptions.api = gridApi;
 
 // Grab the grid data from the supplied API endpoint
 fetch("./data.json")
