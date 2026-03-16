@@ -6,6 +6,12 @@ function getColumnDefs(floatingFilter) {
     { field: "model", filter: true, floatingFilter },
     { field: "condition", filter: "agTextColumnFilter", floatingFilter, filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: 'OR', } },
     {
+      field: "mileage",
+      filter: "agNumberColumnFilter",
+      floatingFilter: false,
+      hide: true,
+    },
+    {
       field: "price",
       pinned: "right",
       floatingFilter: false,
@@ -54,6 +60,28 @@ const eGridDiv = document.querySelector("#myGrid");
 
 function MakeFloating(floating) {
   gridOptions.api.setGridOption('columnDefs', getColumnDefs(floating));
+}
+
+function setColumnFilter(field, filter, floatingFilter = true, hide) {
+  const columnDefs = gridOptions.api.getColumnDefs().map((columnDef) => {
+    if (columnDef.field !== field) {
+      return columnDef;
+    }
+
+    const updatedColumnDef = {
+      ...columnDef,
+      filter,
+      floatingFilter,
+    };
+
+    if (hide !== undefined) {
+      updatedColumnDef.hide = hide;
+    }
+
+    return updatedColumnDef;
+  });
+
+  gridOptions.api.setGridOption('columnDefs', columnDefs);
 }
 
 // create the grid passing in the div to use together with the columns &amp; data we want to use

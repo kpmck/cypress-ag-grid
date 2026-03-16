@@ -239,6 +239,26 @@ Example:
 ```
 ![alt text](./ag-grid-example-filter-text-floating-multi-condition.png "AG Grid Dom - Filter by Text Floating")
 
+For `Between`, pass the lower and upper bounds as two entries for the same column. The command will target the first and second visible inputs for that single `Between` condition:
+
+```javascript
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: [
+        {
+          columnName: "Year",
+          filterValue: "1990",
+          operator: filterOperator.inRange,
+        },
+        {
+          columnName: "Year",
+          filterValue: "2011",
+          operator: filterOperator.inRange,
+        },
+      ],
+      hasApplyButton: true,
+    });
+```
+
 <br/>
 </br>
 

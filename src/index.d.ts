@@ -120,6 +120,10 @@ interface agGridColumnFilterSearchCriteriaOptionsWithOperator extends agGridColu
 }
 
 interface agGridColumnFilterSearchCriteriaOptionsWithMultiFilter extends agGridColumnFilterSearchCriteriaOptionsWithOperator {
+  /** Index of which visible filter input to use when the floating filter renders multiple inputs */
+  searchInputIndex?: number
+  /** Index of which visible operator dropdown to use when the floating filter renders multiple conditions */
+  operatorIndex?: number
   /** Use if floating filter is multiselect checkboxes vs free form input */
   isMultiFilter?: boolean
 }
