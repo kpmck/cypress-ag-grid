@@ -43,7 +43,9 @@ const gridOptionsGrouped = {
 const eGridDivGrouped = document.querySelector("#myGrid2");
 
 // create the grid passing in the div to use together with the columns &amp; data we want to use
-new agGrid.Grid(eGridDivGrouped, gridOptionsGrouped);
+const gridApiGrouped = agGrid.createGrid(eGridDivGrouped, gridOptionsGrouped);
+// keep backward compatibility with code that references gridOptionsGrouped.api
+gridOptionsGrouped.api = gridApiGrouped;
 
 // Grab the grid data from the supplied API endpoint
 fetch("./data.json")
