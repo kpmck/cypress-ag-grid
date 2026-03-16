@@ -330,7 +330,7 @@ function filterBySearchTerm(agGridElement, options) {
     cy.get(agGridElement).agGridWaitForAnimation();
     elem.click();
     cy.get(agGridElement)
-      .find(".ag-popup .ag-list")
+      .find(".ag-popup .ag-select-list")
       .find("span")
       .contains(operator)
       .click();
