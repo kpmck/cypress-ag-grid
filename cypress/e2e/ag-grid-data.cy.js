@@ -212,6 +212,148 @@ describe("ag-grid get data scenarios", () => {
       });
   });
 
+  it("able to filter by text - menu - contains operator", () => {
+    const expectedTableData = [
+      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "excellent", Price: "32000" },
+      { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "good", Price: "25000" },
+      { Year: "2020", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "19000" },
+      { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "900" },
+    ];
+
+    cy.get(agGridSelector).agGridSortColumn("Model", sort.ascending);
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: {
+        columnName: "Make",
+        filterValue: "ord",
+        operator: filterOperator.contains,
+        floatingFilter: true,
+      },
+      hasApplyButton: true,
+    });
+
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        cy.agGridValidateRowsExactOrder(actualTableData, expectedTableData);
+      });
+  });
+
+  it("able to filter by text - menu - does not contain operator", () => {
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: {
+        columnName: "Make",
+        filterValue: "ord",
+        operator: filterOperator.notContains,
+      },
+      hasApplyButton: true,
+    });
+
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        expect(actualTableData.length).to.be.greaterThan(0);
+        actualTableData.forEach((row) => {
+          expect(row.Make).to.not.contain("ord");
+        });
+      });
+  });
+
+  it("able to filter by text - menu - does not equal operator", () => {
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: {
+        columnName: "Make",
+        filterValue: "Ford",
+        operator: filterOperator.notEquals,
+      },
+      hasApplyButton: true,
+    });
+
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        expect(actualTableData.length).to.be.greaterThan(0);
+        actualTableData.forEach((row) => {
+          expect(row.Make).to.not.equal("Ford");
+        });
+      });
+  });
+
+  it("able to filter by text - menu - less than operator", () => {
+    enableMileageNumberFilter();
+
+    cy.get(agGridSelector).agGridColumnFilterTextMenu({
+      searchCriteria: {
+        columnName: "Mileage",
+        filterValue: "5000",
+        operator: filterOperator.lessThan,
+      },
+      hasApplyButton: true,
+    });
+
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        expect(getSortedMileage(actualTableData)).to.deep.equal(["250", "1000", "3500", "4500"]);
+      });
+  });
+
+  it("able to filter by text - menu - less than or equal operator", () => {
+    enableMileageNumberFilter();
+
+    cy.get(agGridSelector).agGridColumnFilterTextMenu({
+      searchCriteria: {
+        columnName: "Mileage",
+        filterValue: "5000",
+        operator: filterOperator.lessThanOrEquals,
+      },
+      hasApplyButton: true,
+    });
+
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        expect(getSortedMileage(actualTableData)).to.deep.equal(["250", "1000", "3500", "4500", "5000"]);
+      });
+  });
+
+  it("able to filter by text - menu - greater than operator", () => {
+    enableMileageNumberFilter();
+
+    cy.get(agGridSelector).agGridColumnFilterTextMenu({
+      searchCriteria: {
+        columnName: "Mileage",
+        filterValue: "50000",
+        operator: filterOperator.greaterThan,
+      },
+      hasApplyButton: true,
+    });
+
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        expect(getSortedMileage(actualTableData)).to.deep.equal(["52000", "60000", "70000", "90000"]);
+      });
+  });
+
+  it("able to filter by text - menu - greater than or equal operator", () => {
+    enableMileageNumberFilter();
+
+    cy.get(agGridSelector).agGridColumnFilterTextMenu({
+      searchCriteria: {
+        columnName: "Mileage",
+        filterValue: "50000",
+        operator: filterOperator.greaterThanOrEquals,
+      },
+      hasApplyButton: true,
+    });
+
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        expect(getSortedMileage(actualTableData)).to.deep.equal(["52000", "60000", "70000", "90000"]);
+      });
+  });
+
   it("able to filter by text - floating filter", () => {
     const expectedTableData = [
       { Year: "2020", Make: "Ford", Model: "Mondeo", Condition: "excellent", Price: "32000" },
@@ -296,27 +438,27 @@ describe("ag-grid get data scenarios", () => {
 
   it("able to filter by text - floating filter - between operator", () => {
     const expectedTableData = [
-      { Year: "1990", Make: "Ford", Model: "Taurus", Condition: "excellent", Price: "900" },
-      { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "fair", Price: "3000" },
-      { Year: "2020", Make: "Toyota", Model: "Celica", Condition: "poor", Price: "5000" },
-      { Year: "2011", Make: "Honda", Model: "Civic", Condition: "good", Price: "9000" },
+      { Year: "2023", Make: "Hyundai", Model: "Santa Fe", Condition: "excellent", Mileage: "250", Price: "" },
+      { Year: "2020", Make: "Porsche", Model: "Boxter", Condition: "good", Mileage: "1000", Price: "99000" },
+      { Year: "2020", Make: "Hyundai", Model: "Elantra", Condition: "fair", Mileage: "3500", Price: "3000" },
+      { Year: "2020", Make: "BMW", Model: "2002", Condition: "excellent", Mileage: "4500", Price: "88001" },
     ];
 
     cy.window().then((win) => {
-      win.setColumnFilter("price", "agNumberColumnFilter");
+      win.setColumnFilter("mileage", "agNumberColumnFilter", true, false);
     });
     cy.get(".ag-cell").should("be.visible");
 
     cy.get(agGridSelector).agGridColumnFilterTextFloating({
       searchCriteria: [
         {
-          columnName: "Price",
+          columnName: "Mileage",
           filterValue: "0",
           operator: filterOperator.inRange,
         },
         {
-          columnName: "Price",
-          filterValue: "9000",
+          columnName: "Mileage",
+          filterValue: "5000",
           operator: filterOperator.inRange,
         },
       ],
@@ -327,16 +469,104 @@ describe("ag-grid get data scenarios", () => {
       .getAgGridData()
       .then((actualTableData) => {
         const sortedActualTableData = [...actualTableData].sort(
-          (a, b) => Number(a.Price) - Number(b.Price)
+          (a, b) => Number(a.Mileage) - Number(b.Mileage)
         );
         const sortedExpectedTableData = [...expectedTableData].sort(
-          (a, b) => Number(a.Price) - Number(b.Price)
+          (a, b) => Number(a.Mileage) - Number(b.Mileage)
         );
 
         cy.agGridValidateRowsExactOrder(
           sortedActualTableData,
           sortedExpectedTableData
         );
+      });
+  });
+
+  it("able to filter by text - floating filter - between operator with explicit indexes", () => {
+    enableMileageNumberFilter(true);
+
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: {
+        columnName: "Mileage",
+        filterValue: "0",
+        operator: filterOperator.inRange,
+        searchInputIndex: 0,
+        operatorIndex: 0,
+      },
+      hasApplyButton: true,
+    });
+
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: {
+        columnName: "Mileage",
+        filterValue: "5000",
+        operator: filterOperator.inRange,
+        searchInputIndex: 1,
+        operatorIndex: 0,
+      },
+      hasApplyButton: true,
+    });
+
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        expect(getSortedMileage(actualTableData)).to.deep.equal(["250", "1000", "3500", "4500"]);
+      });
+  });
+
+  it("able to filter by text - floating filter - between operator with mixed criteria", () => {
+    enableMileageNumberFilter(true);
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: [
+        {
+          columnName: "Mileage",
+          filterValue: "0",
+          operator: filterOperator.inRange,
+        },
+        {
+          columnName: "Mileage",
+          filterValue: "500",
+          operator: filterOperator.inRange,
+        },
+        {
+          columnName: "Make",
+          filterValue: "Ford",
+        },
+      ],
+      hasApplyButton: true,
+    });
+
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        cy.agGridValidateEmptyTable(actualTableData);
+      });
+  });
+
+  it("able to filter by text - floating filter - between operator without apply button", () => {
+    enableMileageNumberFilter(true);
+
+    cy.get(agGridSelector).agGridColumnFilterTextFloating({
+      searchCriteria: [
+        {
+          columnName: "Mileage",
+          filterValue: "0",
+          operator: filterOperator.inRange,
+        },
+        {
+          columnName: "Mileage",
+          filterValue: "5000",
+          operator: filterOperator.inRange,
+        },
+      ],
+      hasApplyButton: false,
+      noMenuTabs: true,
+    });
+
+    cy.get(agGridSelector)
+      .getAgGridData()
+      .then((actualTableData) => {
+        expect(getSortedMileage(actualTableData)).to.deep.equal(["250", "1000", "3500", "4500"]);
       });
   });
 
@@ -386,6 +616,7 @@ describe("ag-grid get data scenarios", () => {
   it("able to sort by ascending order", () => {
     cy.get(agGridSelector).agGridSortColumn("Make", sort.ascending);
     cy.fixture("cardata").then((carData) => {
+      removePropertyFromCollection(carData, ["Mileage"]);
       // This will sort the entirety of our collection by the specified columnName and sort order
       // and will return only the # of records specified. In this example, I include only the first
       // page of data.
@@ -409,6 +640,7 @@ describe("ag-grid get data scenarios", () => {
   it("able to sort by descending order", () => {
     cy.get(agGridSelector).agGridSortColumn("Make", sort.descending);
     cy.fixture("cardata").then((carData) => {
+      removePropertyFromCollection(carData, ["Mileage"]);
       // This will sort the entirety of our collection by the specified columnName and sort order
       // and will return only the # of records specified. In this example, I include only the first
       // page of data.
@@ -432,6 +664,7 @@ describe("ag-grid get data scenarios", () => {
   it("remove column from grid and verify select column data", () => {
     cy.get(agGridSelector).agGridToggleColumnsSideBar("Year", true);
     cy.fixture("cardata").then((expectedTableData) => {
+      removePropertyFromCollection(expectedTableData, ["Mileage"]);
       const expectedData_yearColumnRemoved = removePropertyFromCollection(
         expectedTableData,
         ["Year"]
@@ -450,6 +683,7 @@ describe("ag-grid get data scenarios", () => {
   it("remove single pinned column from grid and verify select column data", () => {
     cy.get(agGridSelector).agGridToggleColumnsSideBar("Price", true);
     cy.fixture("cardata").then((expectedTableData) => {
+      removePropertyFromCollection(expectedTableData, ["Mileage"]);
       const expectedData_priceColumnRemoved = removePropertyFromCollection(
         expectedTableData,
         ["Price"]
@@ -470,6 +704,7 @@ describe("ag-grid get data scenarios", () => {
     cy.get(agGridSelector).agGridToggleColumnsSideBar("Price", true);
     cy.get(agGridSelector).agGridToggleColumnsSideBar("Make", true);
     cy.fixture("cardata").then((expectedTableData) => {
+      removePropertyFromCollection(expectedTableData, ["Mileage"]);
       const expectedData_multipleColumnsRemoved = removePropertyFromCollection(
         expectedTableData,
         ["Price", "Make"]
@@ -607,6 +842,32 @@ function removePropertyFromCollection(expectedTableData, columnsToExclude) {
     });
   }
   return expectedTableData;
+}
+
+function enablePriceNumberFilter(floatingFilter = false) {
+  cy.window().then((win) => {
+    win.setColumnFilter("price", "agNumberColumnFilter", floatingFilter);
+  });
+  cy.get(".ag-cell").should("be.visible");
+}
+
+function enableMileageNumberFilter(floatingFilter = false) {
+  cy.window().then((win) => {
+    win.setColumnFilter("mileage", "agNumberColumnFilter", floatingFilter, false);
+  });
+  cy.get(".ag-cell").should("be.visible");
+}
+
+function getSortedPrices(actualTableData) {
+  return actualTableData
+    .map((row) => row.Price)
+    .sort((a, b) => Number(a) - Number(b));
+}
+
+function getSortedMileage(actualTableData) {
+  return actualTableData
+    .map((row) => row.Mileage)
+    .sort((a, b) => Number(a) - Number(b));
 }
 
 // /// THE BELOW METHODS SHOWCASE HOW TO DYNAMICALLY GET THE EXPECTED DATA AND MANIPULATE IT FOR VALIDATION
