@@ -18,7 +18,9 @@
     "cypress aggrid"
   ],
   "scripts": {
-    "test": "npx cypress run --headless --spec cypress/e2e/*.cy.js",
+    "test": "npx cypress run --headless --spec \"cypress/e2e/*.cy.js\"",
+    "test:v34": "npx cypress run --headless --spec \"cypress/e2e/*.v34.cy.js\"",
+    "test:v35": "npx cypress run --headless --spec \"cypress/e2e/*.v35.cy.js\"",
     "test:watch": "npx cypress open"
   },
   "author": "Kerry McKeever <kerry@kerrymckeever.com>",
