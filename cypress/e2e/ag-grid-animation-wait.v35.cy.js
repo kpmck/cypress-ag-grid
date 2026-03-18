@@ -30,6 +30,8 @@ describe("agGridWaitForAnimation", () => {
       win.__animationProbe.waitStartedAt = Date.now();
     });
 
+    cy.get("#myGrid .os-scrollbar-handle").should("exist");
+
     cy.get("#myGrid")
       .agGridWaitForAnimation()
       .then(() => {

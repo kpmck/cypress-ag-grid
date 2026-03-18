@@ -77,9 +77,17 @@ function startAgOwnedAnimation() {
 
 function installThirdPartyAnimationTrap() {
   const grid = document.querySelector("#myGrid");
-  const handle = document.createElement("div");
-  handle.className = "os-scrollbar-handle";
-  grid.appendChild(handle);
+  const overlayScrollbarsApi = window.OverlayScrollbarsGlobal?.OverlayScrollbars;
+  if (typeof overlayScrollbarsApi !== "function") {
+    throw new Error("Expected OverlayScrollbarsGlobal.OverlayScrollbars to be available.");
+  }
+
+  overlayScrollbarsApi(grid, {});
+
+  const handle = grid.querySelector(".os-scrollbar-handle");
+  if (!handle) {
+    throw new Error("Expected OverlayScrollbars to render an .os-scrollbar-handle element.");
+  }
 
   extraAnimations.push({
     effect: {
