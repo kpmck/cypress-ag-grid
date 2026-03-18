@@ -20,26 +20,53 @@ export const agGridWaitForAnimation = async (agGridElement) => {
     throw new Error(`Couldn't find the element ${agGridElement}`);
   }
 
-  const animations = agGridElement.get()[0].getAnimations({ subtree: true });
+  const AG_GRID_ANIMATION_TIMEOUT_MS = 5000;
+  const agGridRootElement = agGridElement.get()[0];
+  const animations = agGridRootElement.getAnimations({ subtree: true });
+
+  const agGridAnimations = animations.filter((animation) => {
+    const animationTarget = animation.effect?.target;
+    if (
+      !animationTarget ||
+      animationTarget.nodeType !== 1 ||
+      !animationTarget.classList
+    ) {
+      return false;
+    }
+
+    const hasAgGridClass = [...animationTarget.classList].some((className) =>
+      className.startsWith("ag-")
+    );
+
+    return (
+      animationTarget === agGridRootElement ||
+      hasAgGridClass
+    );
+  });
 
   // Filter out infinite animations (e.g. loading spinners) whose .finished
   // promise never resolves per the Web Animations API spec.
-  const finiteAnimations = animations.filter((animation) => {
+  const finiteAnimations = agGridAnimations.filter((animation) => {
     const iterations = animation.effect?.getTiming?.()?.iterations;
     return iterations !== Infinity;
   });
 
-  await Promise.all(
-    finiteAnimations.map(async (animation) => {
-      try {
-        await animation.finished;
-      } catch (error) {
-        if (error.name === "AbortError") return;
-        console.error("error", error, error.name);
-        throw error;
-      }
-    })
-  );
+  await Promise.race([
+    Promise.all(
+      finiteAnimations.map(async (animation) => {
+        try {
+          await animation.finished;
+        } catch (error) {
+          if (error.name === "AbortError") return;
+          console.error("error", error, error.name);
+          throw error;
+        }
+      })
+    ),
+    new Promise((resolve) => {
+      setTimeout(resolve, AG_GRID_ANIMATION_TIMEOUT_MS);
+    }),
+  ]);
 
   return agGridElement;
 };
